@@ -9,6 +9,8 @@ interface DepartmentRepositoryInterface
 {
     public function getAll(): Collection;
 
+    public function count(): int;
+
     public function find(int $id): ?Department;
 
     public function create(array $data): Department;

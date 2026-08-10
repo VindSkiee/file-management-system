@@ -15,6 +15,11 @@ class DepartmentRepository implements DepartmentRepositoryInterface
             ->get();
     }
 
+    public function count(): int
+    {
+        return Department::query()->count();
+    }
+
     public function find(int $id): ?Department
     {
         return Department::query()->find($id);
