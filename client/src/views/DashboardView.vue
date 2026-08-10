@@ -82,6 +82,7 @@ onMounted(() => {
             <tr class="bg-gray-50 dark:bg-gray-700">
               <th class="px-6 py-3 font-semibold text-gray-600 dark:text-gray-300">Title</th>
               <th class="px-6 py-3 font-semibold text-gray-600 dark:text-gray-300">Department</th>
+              <th class="px-6 py-3 font-semibold text-gray-600 dark:text-gray-300">Folder</th>
               <th class="px-6 py-3 font-semibold text-gray-600 dark:text-gray-300">Nama File</th>
               <th class="px-6 py-3 font-semibold text-gray-600 dark:text-gray-300 text-center">Upload Date</th>
             </tr>
@@ -99,6 +100,10 @@ onMounted(() => {
               <td class="block py-1 md:table-cell md:px-6 md:py-3">
                 <span class="mr-2 inline font-medium text-gray-500 dark:text-gray-400 md:hidden">Department:</span>
                 <span class="text-gray-700 dark:text-gray-200">{{ file.department?.name ?? '-' }}</span>
+              </td>
+              <td class="block py-1 md:table-cell md:px-6 md:py-3">
+                <span class="mr-2 inline font-medium text-gray-500 dark:text-gray-400 md:hidden">Folder:</span>
+                <span class="text-gray-700 dark:text-gray-200">{{ file.folder?.name ?? 'Root' }}</span>
               </td>
               <td class="block py-1 md:table-cell md:px-6 md:py-3">
                 <span class="mr-2 inline font-medium text-gray-500 dark:text-gray-400 md:hidden">Nama File:</span>
