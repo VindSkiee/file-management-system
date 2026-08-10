@@ -18,6 +18,12 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
+      path: '/departments',
+      name: 'departments',
+      component: () => import('@/views/DepartmentView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
       path: '/',
       redirect: { name: 'dashboard' },
     },

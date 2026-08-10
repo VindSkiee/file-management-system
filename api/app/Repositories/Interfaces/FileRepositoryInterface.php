@@ -9,6 +9,10 @@ interface FileRepositoryInterface
 {
     public function getAll(): Collection;
 
+    public function getLatest(int $limit): Collection;
+
+    public function count(): int;
+
     public function find(int $id): ?File;
 
     public function create(array $data): File;

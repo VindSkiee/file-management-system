@@ -19,6 +19,11 @@ class FolderRepository implements FolderRepositoryInterface
             ->get();
     }
 
+    public function count(): int
+    {
+        return Folder::query()->count();
+    }
+
     public function find(int $id): ?Folder
     {
         return Folder::query()->find($id);

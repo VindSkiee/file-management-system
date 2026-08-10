@@ -9,6 +9,8 @@ interface FolderRepositoryInterface
 {
     public function getTree(): Collection;
 
+    public function count(): int;
+
     public function find(int $id): ?Folder;
 
     public function create(array $data): Folder;

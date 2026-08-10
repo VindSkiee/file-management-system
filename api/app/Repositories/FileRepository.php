@@ -16,6 +16,20 @@ class FileRepository implements FileRepositoryInterface
             ->get();
     }
 
+    public function getLatest(int $limit): Collection
+    {
+        return File::query()
+            ->with(['folder', 'department', 'uploader'])
+            ->latest()
+            ->limit($limit)
+            ->get();
+    }
+
+    public function count(): int
+    {
+        return File::query()->count();
+    }
+
     public function find(int $id): ?File
     {
         return File::query()
