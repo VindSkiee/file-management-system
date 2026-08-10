@@ -8,6 +8,7 @@ use App\Http\Resources\FolderResource;
 use App\Models\Folder;
 use App\Services\FolderService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
 class FolderController extends Controller
@@ -16,13 +17,15 @@ class FolderController extends Controller
         protected FolderService $folderService,
     ) {}
 
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
         Gate::authorize('viewAny', Folder::class);
 
-        $tree = $this->folderService->getTree();
+        $parentId = $request->integer('parent_id') ?: null;
 
-        return FolderResource::collection($tree)->response();
+        $folders = $this->folderService->getByParent($parentId);
+
+        return FolderResource::collection($folders)->response();
     }
 
     public function store(StoreFolderRequest $request): JsonResponse

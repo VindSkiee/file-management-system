@@ -24,6 +24,12 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
+      path: '/folders',
+      name: 'folders',
+      component: () => import('@/views/FolderView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
       path: '/',
       redirect: { name: 'dashboard' },
     },

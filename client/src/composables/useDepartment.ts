@@ -1,6 +1,6 @@
 import { ref } from 'vue'
-import { isAxiosError } from 'axios'
 import api from '@/services/api'
+import { extractErrorMessage } from '@/utils/error'
 
 export interface Department {
   id: number
@@ -11,27 +11,6 @@ export interface Department {
 
 export interface DepartmentInput {
   name: string
-}
-
-function extractError(err: unknown, fallback: string): string {
-  if (isAxiosError(err)) {
-    const status = err.response?.status
-    const message = err.response?.data?.message
-    const errors = err.response?.data?.errors as Record<string, string[]> | undefined
-
-    if (status === 403) {
-      return 'Anda tidak memiliki izin untuk melakukan aksi ini.'
-    }
-
-    if (status === 422) {
-      const firstError = errors ? Object.values(errors)[0]?.[0] : undefined
-      if (typeof firstError === 'string') return firstError
-    }
-
-    if (typeof message === 'string') return message
-  }
-
-  return fallback
 }
 
 export function useDepartment() {
@@ -47,7 +26,7 @@ export function useDepartment() {
       const { data } = await api.get<{ data: Department[] }>('/departments')
       departments.value = data.data
     } catch (err: unknown) {
-      error.value = extractError(err, 'Gagal memuat daftar department.')
+      error.value = extractErrorMessage(err, 'Gagal memuat daftar department.')
     } finally {
       isLoading.value = false
     }
@@ -60,7 +39,7 @@ export function useDepartment() {
       await api.post('/departments', input)
       return true
     } catch (err: unknown) {
-      error.value = extractError(err, 'Gagal menambah department.')
+      error.value = extractErrorMessage(err, 'Gagal menambah department.')
       return false
     }
   }
@@ -72,7 +51,7 @@ export function useDepartment() {
       await api.put(`/departments/${id}`, input)
       return true
     } catch (err: unknown) {
-      error.value = extractError(err, 'Gagal memperbarui department.')
+      error.value = extractErrorMessage(err, 'Gagal memperbarui department.')
       return false
     }
   }
@@ -84,7 +63,7 @@ export function useDepartment() {
       await api.delete(`/departments/${id}`)
       return true
     } catch (err: unknown) {
-      error.value = extractError(err, 'Gagal menghapus department.')
+      error.value = extractErrorMessage(err, 'Gagal menghapus department.')
       return false
     }
   }

@@ -19,6 +19,15 @@ class FolderRepository implements FolderRepositoryInterface
             ->get();
     }
 
+    public function getByParent(?int $parentId): Collection
+    {
+        // NULL parent_id resolves to "WHERE parent_id IS NULL" (root folders).
+        return Folder::query()
+            ->where('parent_id', $parentId)
+            ->orderBy('name')
+            ->get();
+    }
+
     public function count(): int
     {
         return Folder::query()->count();

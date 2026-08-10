@@ -9,6 +9,8 @@ interface FolderRepositoryInterface
 {
     public function getTree(): Collection;
 
+    public function getByParent(?int $parentId): Collection;
+
     public function count(): int;
 
     public function find(int $id): ?Folder;

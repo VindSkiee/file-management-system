@@ -19,6 +19,11 @@ class FolderService
         return $this->folderRepository->getTree();
     }
 
+    public function getByParent(?int $parentId): Collection
+    {
+        return $this->folderRepository->getByParent($parentId);
+    }
+
     public function find(int $id): Folder
     {
         return $this->findOrFail($id);
