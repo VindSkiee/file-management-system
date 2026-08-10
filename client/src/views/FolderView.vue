@@ -308,9 +308,10 @@ async function handleFileDownload(file: FileItem): Promise<void> {
         <table class="w-full text-left text-sm md:min-w-full">
           <thead class="hidden md:table-header-group">
             <tr class="bg-gray-50">
-              <th class="px-6 py-3 font-semibold text-gray-600">Nama File</th>
               <th class="px-6 py-3 font-semibold text-gray-600">Title</th>
               <th class="px-6 py-3 font-semibold text-gray-600">Department</th>
+              <th class="px-6 py-3 font-semibold text-gray-600">Nama File</th>
+              <th class="px-6 py-3 font-semibold text-gray-600">Upload Date</th>
               <th class="px-6 py-3 text-right font-semibold text-gray-600">Aksi</th>
             </tr>
           </thead>
@@ -320,16 +321,6 @@ async function handleFileDownload(file: FileItem): Promise<void> {
               :key="file.id"
               :class="['block px-4 py-3 md:table-row md:px-0 md:py-0', file.deleted_at ? 'bg-red-50' : 'hover:bg-gray-50']"
             >
-              <td class="block py-1 md:table-cell md:px-6 md:py-3">
-                <span class="mr-2 inline font-medium text-gray-500 md:hidden">Nama File:</span>
-                <span
-                  :class="file.deleted_at
-                    ? 'font-medium text-gray-400 line-through'
-                    : 'font-medium text-gray-800'"
-                >
-                  {{ file.file_name }}
-                </span>
-              </td>
               <td class="block py-1 md:table-cell md:px-6 md:py-3">
                 <span class="mr-2 inline font-medium text-gray-500 md:hidden">Title:</span>
                 <span
@@ -343,6 +334,20 @@ async function handleFileDownload(file: FileItem): Promise<void> {
               <td class="block py-1 md:table-cell md:px-6 md:py-3">
                 <span class="mr-2 inline font-medium text-gray-500 md:hidden">Department:</span>
                 <span class="text-gray-700">{{ file.department?.name ?? '-' }}</span>
+              </td>
+              <td class="block py-1 md:table-cell md:px-6 md:py-3">
+                <span class="mr-2 inline font-medium text-gray-500 md:hidden">Nama File:</span>
+                <span
+                  :class="file.deleted_at
+                    ? 'font-medium text-gray-400 line-through'
+                    : 'font-medium text-gray-800'"
+                >
+                  {{ file.file_name }}
+                </span>
+              </td>
+              <td class="block py-1 md:table-cell md:px-6 md:py-3">
+                <span class="mr-2 inline font-medium text-gray-500 md:hidden">Upload Date:</span>
+                <span class="text-gray-700">{{ file.upload_date }}</span>
               </td>
               <td class="block pt-1 md:table-cell md:px-6 md:py-3">
                 <div class="flex flex-wrap gap-2 md:justify-end">

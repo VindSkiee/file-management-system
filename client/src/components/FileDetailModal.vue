@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import BaseModal from '@/components/BaseModal.vue'
+import FilePreviewModal from '@/components/FilePreviewModal.vue'
 import { useFile, type FileItem } from '@/composables/useFile'
+import { getPreviewType } from '@/utils/preview'
 
 const props = defineProps<{
   show: boolean
@@ -14,14 +16,16 @@ const emit = defineEmits<{
 
 const { downloadFile, error } = useFile()
 
-const previewType = computed<'image' | 'pdf' | null>(() => {
-  const name = props.file?.file_name.toLowerCase() ?? ''
+const showPreview = ref(false)
+const previewType = computed(() => (props.file ? getPreviewType(props.file.file_name) : null))
 
-  if (/\.(png|jpe?g|gif|webp)$/.test(name)) return 'image'
-  if (name.endsWith('.pdf')) return 'pdf'
+function openPreview(): void {
+  showPreview.value = true
+}
 
-  return null
-})
+function closePreview(): void {
+  showPreview.value = false
+}
 
 async function handleDownload(): Promise<void> {
   if (props.file) await downloadFile(props.file)
@@ -61,28 +65,25 @@ async function handleDownload(): Promise<void> {
       </div>
     </dl>
 
-    <div v-if="file && previewType" class="mt-5">
-      <img
-        v-if="previewType === 'image'"
-        :src="file.file_url"
-        :alt="file.title"
-        class="mx-auto max-h-72 rounded border border-gray-200"
-      />
-      <iframe
-        v-else
-        :src="file.file_url"
-        title="File Preview"
-        class="h-72 w-full rounded border border-gray-200"
-      ></iframe>
-    </div>
-
-    <div class="mt-6 flex justify-end gap-2">
+    <div class="mt-6 flex flex-wrap justify-end gap-2">
       <button
         type="button"
         @click="emit('close')"
         class="rounded bg-gray-200 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-300"
       >
         Tutup
+      </button>
+      <button
+        v-if="previewType"
+        type="button"
+        @click="openPreview"
+        class="inline-flex items-center gap-1 rounded bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-emerald-700"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-4 w-4">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+        </svg>
+        Preview File
       </button>
       <button
         type="button"
@@ -95,5 +96,7 @@ async function handleDownload(): Promise<void> {
         Download File
       </button>
     </div>
+
+    <FilePreviewModal :show="showPreview" :file="file" @close="closePreview" />
   </BaseModal>
 </template>
