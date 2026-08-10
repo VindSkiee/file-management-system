@@ -28,7 +28,7 @@ class FileController extends Controller
         $departmentId = $request->integer('department_id') ?: null;
         $withTrashed = $request->boolean('trashed');
 
-        $files = $this->fileService->getByFolder($folderId, $search, $departmentId, $withTrashed);
+        $files = $this->fileService->paginateByFolder($folderId, $search, $departmentId, $withTrashed, $request->integer('per_page') ?: null);
 
         return FileResource::collection($files)->response();
     }

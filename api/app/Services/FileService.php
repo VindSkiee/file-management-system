@@ -4,9 +4,9 @@ namespace App\Services;
 
 use App\Models\File;
 use App\Repositories\Interfaces\FileRepositoryInterface;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -21,14 +21,9 @@ class FileService
         protected FileRepositoryInterface $fileRepository,
     ) {}
 
-    public function getAll(): Collection
+    public function paginateByFolder(?int $folderId, ?string $search = null, ?int $departmentId = null, bool $withTrashed = false, ?int $perPage = null): LengthAwarePaginator
     {
-        return $this->fileRepository->getAll();
-    }
-
-    public function getByFolder(?int $folderId, ?string $search = null, ?int $departmentId = null, bool $withTrashed = false): Collection
-    {
-        return $this->fileRepository->getByFolder($folderId, $search, $departmentId, $withTrashed);
+        return $this->fileRepository->paginateByFolder($folderId, $search, $departmentId, $withTrashed, $perPage);
     }
 
     public function find(int $id): File

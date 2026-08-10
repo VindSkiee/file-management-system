@@ -3,13 +3,12 @@
 namespace App\Repositories\Interfaces;
 
 use App\Models\File;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 
 interface FileRepositoryInterface
 {
-    public function getAll(): Collection;
-
-    public function getByFolder(?int $folderId, ?string $search = null, ?int $departmentId = null, bool $withTrashed = false): Collection;
+    public function paginateByFolder(?int $folderId, ?string $search = null, ?int $departmentId = null, bool $withTrashed = false, ?int $perPage = null): LengthAwarePaginator;
 
     public function getLatest(int $limit): Collection;
 

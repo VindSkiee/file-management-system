@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, reactive, ref, watch } from 'vue'
+import { computed, onMounted, reactive, ref, watch } from 'vue'
 import AppLayout from '@/layouts/AppLayout.vue'
 import BaseModal from '@/components/BaseModal.vue'
 import BreadcrumbNav, { type BreadcrumbItem } from '@/components/BreadcrumbNav.vue'
@@ -17,6 +17,8 @@ const {
   folders,
   isLoading: foldersLoading,
   error: foldersError,
+  page: foldersPage,
+  lastPage: foldersLastPage,
   getFolders,
   createFolder,
   updateFolder,
@@ -27,6 +29,8 @@ const {
   files,
   isLoading: filesLoading,
   error: filesError,
+  page: filesPage,
+  lastPage: filesLastPage,
   getFiles,
   deleteFile,
   restoreFile,
@@ -40,6 +44,11 @@ const searchQuery = ref('')
 const departmentFilter = ref<number | null>(null)
 const showTrashed = ref(false)
 
+const canPrevFolders = computed(() => foldersPage.value > 1)
+const canNextFolders = computed(() => foldersPage.value < foldersLastPage.value)
+const canPrevFiles = computed(() => filesPage.value > 1)
+const canNextFiles = computed(() => filesPage.value < filesLastPage.value)
+
 const showFolderModal = ref(false)
 const editingFolderId = ref<number | null>(null)
 const form = reactive({ name: '' })
@@ -52,7 +61,7 @@ const showDetailModal = ref(false)
 const detailFile = ref<FileItem | null>(null)
 
 onMounted(() => {
-  getDepartments()
+  getDepartments(false, 1, 100)
   loadFolderContents()
 })
 
@@ -61,27 +70,44 @@ let searchTimer: ReturnType<typeof setTimeout> | undefined
 watch([searchQuery, departmentFilter], () => {
   clearTimeout(searchTimer)
   searchTimer = setTimeout(() => {
+    filesPage.value = 1
     reloadFiles()
   }, 300)
 })
 
 watch(showTrashed, () => {
+  foldersPage.value = 1
+  filesPage.value = 1
   loadFolderContents()
 })
 
 async function loadFolderContents(): Promise<void> {
   await Promise.all([
-    getFolders(currentParentId.value, showTrashed.value),
-    getFiles(currentParentId.value, searchQuery.value, departmentFilter.value, showTrashed.value),
+    getFolders(currentParentId.value, showTrashed.value, foldersPage.value),
+    getFiles(currentParentId.value, searchQuery.value, departmentFilter.value, showTrashed.value, filesPage.value),
   ])
 }
 
 function reloadFiles(): void {
-  getFiles(currentParentId.value, searchQuery.value, departmentFilter.value, showTrashed.value)
+  getFiles(currentParentId.value, searchQuery.value, departmentFilter.value, showTrashed.value, filesPage.value)
+}
+
+function goToFolders(nextPage: number): void {
+  if (nextPage < 1 || nextPage > foldersLastPage.value) return
+  foldersPage.value = nextPage
+  getFolders(currentParentId.value, showTrashed.value, nextPage)
+}
+
+function goToFiles(nextPage: number): void {
+  if (nextPage < 1 || nextPage > filesLastPage.value) return
+  filesPage.value = nextPage
+  getFiles(currentParentId.value, searchQuery.value, departmentFilter.value, showTrashed.value, nextPage)
 }
 
 function openFolder(folder: Folder): void {
   currentParentId.value = folder.id
+  foldersPage.value = 1
+  filesPage.value = 1
   breadcrumbs.value = [...breadcrumbs.value, { id: folder.id, name: folder.name }]
   loadFolderContents()
 }
@@ -94,6 +120,8 @@ function navigateTo(item: BreadcrumbItem): void {
   }
 
   currentParentId.value = item.id
+  foldersPage.value = 1
+  filesPage.value = 1
   loadFolderContents()
 }
 
@@ -251,6 +279,33 @@ async function handleFileDownload(file: FileItem): Promise<void> {
       />
     </div>
 
+    <div
+      v-if="folders.length > 0"
+      class="mt-4 flex flex-wrap items-center justify-between gap-3"
+    >
+      <p class="text-sm text-gray-500 dark:text-gray-400">
+        Halaman {{ foldersPage }} dari {{ foldersLastPage }}
+      </p>
+      <div class="flex gap-2">
+        <button
+          type="button"
+          :disabled="!canPrevFolders"
+          @click="goToFolders(foldersPage - 1)"
+          class="rounded bg-gray-200 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-300 disabled:opacity-40 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+        >
+          Sebelumnya
+        </button>
+        <button
+          type="button"
+          :disabled="!canNextFolders"
+          @click="goToFolders(foldersPage + 1)"
+          class="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700 disabled:opacity-40"
+        >
+          Berikutnya
+        </button>
+      </div>
+    </div>
+
     <div class="mt-8 overflow-hidden rounded-lg bg-white shadow transition-colors duration-200 dark:bg-gray-800">
       <div class="flex flex-wrap items-center justify-between gap-3 border-b px-4 py-4 md:px-6 dark:border-gray-700">
         <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100">Files</h3>
@@ -259,7 +314,7 @@ async function handleFileDownload(file: FileItem): Promise<void> {
           @click="openCreateFile"
           class="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
         >
-          Upload File
+          Unggah File
         </button>
       </div>
 
@@ -345,12 +400,12 @@ async function handleFileDownload(file: FileItem): Promise<void> {
                   {{ file.file_name }}
                 </span>
               </td>
-              <td class="block py-1 text-center md:table-cell md:px-6 md:py-3">
+              <td class="block py-1 md:table-cell md:px-6 md:py-3 md:text-center">
                 <span class="mr-2 inline font-medium text-gray-500 dark:text-gray-400 md:hidden">Upload Date:</span>
                 <span class="text-gray-700 dark:text-gray-200">{{ file.upload_date }}</span>
               </td>
-              <td class="block pt-1 text-center md:table-cell md:px-6 md:py-3">
-                <div class="flex flex-wrap justify-center gap-2">
+              <td class="block pt-1 md:table-cell md:px-6 md:py-3 md:text-center">
+                <div class="flex flex-wrap gap-2 md:justify-center">
                   <button
                     v-if="file.deleted_at"
                     @click="handleFileRestore(file)"
@@ -364,27 +419,27 @@ async function handleFileDownload(file: FileItem): Promise<void> {
                       @click="openFileDetail(file)"
                       class="rounded bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-600 transition hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-300 dark:hover:bg-blue-900/50"
                     >
-                      View Detail
+                      Lihat Detail
                     </button>
                     <button
                       @click="handleFileDownload(file)"
                       class="rounded bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-600 transition hover:bg-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-300 dark:hover:bg-emerald-900/50"
                     >
-                      Download
+                      Unduh
                     </button>
                     <button
                       v-if="authStore.isAdmin"
                       @click="openEditFile(file)"
                       class="rounded bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-600 transition hover:bg-amber-100 dark:bg-amber-900/30 dark:text-amber-300 dark:hover:bg-amber-900/50"
                     >
-                      Edit
+                      Ubah
                     </button>
                     <button
                       v-if="authStore.isAdmin"
                       @click="handleFileDelete(file)"
                       class="rounded bg-red-50 px-2.5 py-1 text-xs font-medium text-red-600 transition hover:bg-red-100 dark:bg-red-900/30 dark:text-red-300 dark:hover:bg-red-900/50"
                     >
-                      Delete
+                      Hapus
                     </button>
                   </template>
                 </div>
@@ -392,6 +447,33 @@ async function handleFileDownload(file: FileItem): Promise<void> {
             </tr>
           </tbody>
         </table>
+      </div>
+
+      <div
+        v-if="files.length > 0"
+        class="flex flex-wrap items-center justify-between gap-3 border-t px-4 py-3 md:px-6 dark:border-gray-700"
+      >
+        <p class="text-sm text-gray-500 dark:text-gray-400">
+          Halaman {{ filesPage }} dari {{ filesLastPage }}
+        </p>
+        <div class="flex gap-2">
+          <button
+            type="button"
+            :disabled="!canPrevFiles"
+            @click="goToFiles(filesPage - 1)"
+            class="rounded bg-gray-200 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-300 disabled:opacity-40 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+          >
+            Sebelumnya
+          </button>
+          <button
+            type="button"
+            :disabled="!canNextFiles"
+            @click="goToFiles(filesPage + 1)"
+            class="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700 disabled:opacity-40"
+          >
+            Berikutnya
+          </button>
+        </div>
       </div>
     </div>
 

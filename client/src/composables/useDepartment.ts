@@ -18,15 +18,25 @@ export function useDepartment() {
   const departments = ref<Department[]>([])
   const isLoading = ref(false)
   const error = ref('')
+  const page = ref(1)
+  const lastPage = ref(1)
 
-  async function getDepartments(withTrashed = false): Promise<void> {
+  async function getDepartments(withTrashed = false, nextPage = 1, perPage = 15): Promise<void> {
     isLoading.value = true
     error.value = ''
 
     try {
-      const params = withTrashed ? { trashed: true } : {}
-      const { data } = await api.get<{ data: Department[] }>('/departments', { params })
+      const params: Record<string, string | number | boolean> = { page: nextPage, per_page: perPage }
+      if (withTrashed) params.trashed = true
+
+      const { data } = await api.get<{
+        data: Department[]
+        meta: { current_page: number; last_page: number }
+      }>('/departments', { params })
+
       departments.value = data.data
+      page.value = data.meta?.current_page ?? nextPage
+      lastPage.value = data.meta?.last_page ?? 1
     } catch (err: unknown) {
       error.value = extractErrorMessage(err, 'Gagal memuat daftar department.')
     } finally {
@@ -86,6 +96,8 @@ export function useDepartment() {
     departments,
     isLoading,
     error,
+    page,
+    lastPage,
     getDepartments,
     createDepartment,
     updateDepartment,

@@ -22,7 +22,7 @@ class DepartmentController extends Controller
     {
         Gate::authorize('viewAny', Department::class);
 
-        $departments = $this->departmentService->getAll($request->boolean('trashed'));
+        $departments = $this->departmentService->paginate($request->boolean('trashed'), $request->integer('per_page') ?: null);
 
         return DepartmentResource::collection($departments)->response();
     }

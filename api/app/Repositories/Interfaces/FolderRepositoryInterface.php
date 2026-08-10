@@ -3,13 +3,14 @@
 namespace App\Repositories\Interfaces;
 
 use App\Models\Folder;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 
 interface FolderRepositoryInterface
 {
     public function getTree(): Collection;
 
-    public function getByParent(?int $parentId, bool $withTrashed = false): Collection;
+    public function paginateByParent(?int $parentId, bool $withTrashed = false, ?int $perPage = null): LengthAwarePaginator;
 
     public function count(): int;
 

@@ -81,8 +81,8 @@ onMounted(() => {
           <thead class="hidden md:table-header-group">
             <tr class="bg-gray-50 dark:bg-gray-700">
               <th class="px-6 py-3 font-semibold text-gray-600 dark:text-gray-300">Title</th>
-              <th class="px-6 py-3 font-semibold text-gray-600 dark:text-gray-300">Department</th>
-              <th class="px-6 py-3 font-semibold text-gray-600 dark:text-gray-300">Folder</th>
+              <th class="px-6 py-3 font-semibold text-gray-600 dark:text-gray-300 text-center">Department</th>
+              <th class="px-6 py-3 font-semibold text-gray-600 dark:text-gray-300 text-center">Folder</th>
               <th class="px-6 py-3 font-semibold text-gray-600 dark:text-gray-300">Nama File</th>
               <th class="px-6 py-3 font-semibold text-gray-600 dark:text-gray-300 text-center">Upload Date</th>
             </tr>
@@ -97,11 +97,11 @@ onMounted(() => {
                 <span class="mr-2 inline font-medium text-gray-500 dark:text-gray-400 md:hidden">Title:</span>
                 <span class="text-gray-700 dark:text-gray-200">{{ file.title }}</span>
               </td>
-              <td class="block py-1 md:table-cell md:px-6 md:py-3">
+              <td class="block py-1 md:table-cell md:px-6 md:py-3 md:text-center">
                 <span class="mr-2 inline font-medium text-gray-500 dark:text-gray-400 md:hidden">Department:</span>
                 <span class="text-gray-700 dark:text-gray-200">{{ file.department?.name ?? '-' }}</span>
               </td>
-              <td class="block py-1 md:table-cell md:px-6 md:py-3">
+              <td class="block py-1 md:table-cell md:px-6 md:py-3 md:text-center">
                 <span class="mr-2 inline font-medium text-gray-500 dark:text-gray-400 md:hidden">Folder:</span>
                 <span class="text-gray-700 dark:text-gray-200">{{ file.folder?.name ?? 'Root' }}</span>
               </td>
@@ -109,7 +109,7 @@ onMounted(() => {
                 <span class="mr-2 inline font-medium text-gray-500 dark:text-gray-400 md:hidden">Nama File:</span>
                 <span class="font-medium text-gray-800 dark:text-gray-100">{{ file.file_name }}</span>
               </td>
-              <td class="block py-1 md:table-cell md:px-6 md:py-3 text-center">
+              <td class="block py-1 md:table-cell md:px-6 md:py-3 md:text-center">
                 <span class="mr-2 inline font-medium text-gray-500 dark:text-gray-400 md:hidden">Upload Date:</span>
                 <span class="text-gray-700 dark:text-gray-200">{{ file.upload_date }}</span>
               </td>

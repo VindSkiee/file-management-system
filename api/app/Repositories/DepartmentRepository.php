@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Models\Department;
 use App\Repositories\Interfaces\DepartmentRepositoryInterface;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 
 class DepartmentRepository implements DepartmentRepositoryInterface
@@ -14,6 +15,14 @@ class DepartmentRepository implements DepartmentRepositoryInterface
             ->when($withTrashed, fn ($query) => $query->withTrashed())
             ->orderBy('id')
             ->get();
+    }
+
+    public function paginate(bool $withTrashed = false, ?int $perPage = null): LengthAwarePaginator
+    {
+        return Department::query()
+            ->when($withTrashed, fn ($query) => $query->withTrashed())
+            ->orderBy('id')
+            ->paginate($perPage ?? 15);
     }
 
     public function count(): int

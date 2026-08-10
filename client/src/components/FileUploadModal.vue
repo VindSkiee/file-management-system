@@ -42,7 +42,7 @@ watch(
     selectedFile.value = null
     uploadError.value = ''
 
-    getDepartments()
+    getDepartments(false, 1, 100)
   },
 )
 
@@ -173,7 +173,7 @@ async function handleSubmit(): Promise<void> {
           :disabled="!form.title.trim() || form.department_id === null || submitting"
           class="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700 disabled:opacity-50"
         >
-          {{ submitting ? 'Menyimpan...' : editingFile ? 'Simpan' : 'Upload' }}
+          {{ submitting ? 'Menyimpan...' : editingFile ? 'Simpan' : 'Unggah' }}
         </button>
       </div>
     </form>

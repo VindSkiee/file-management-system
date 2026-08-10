@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Folder;
 use App\Repositories\Interfaces\FolderRepositoryInterface;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\ValidationException;
@@ -19,9 +20,9 @@ class FolderService
         return $this->folderRepository->getTree();
     }
 
-    public function getByParent(?int $parentId, bool $withTrashed = false): Collection
+    public function paginateByParent(?int $parentId, bool $withTrashed = false, ?int $perPage = null): LengthAwarePaginator
     {
-        return $this->folderRepository->getByParent($parentId, $withTrashed);
+        return $this->folderRepository->paginateByParent($parentId, $withTrashed, $perPage);
     }
 
     public function find(int $id): Folder

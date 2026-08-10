@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Department;
 use App\Repositories\Interfaces\DepartmentRepositoryInterface;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\ValidationException;
@@ -17,6 +18,11 @@ class DepartmentService
     public function getAll(bool $withTrashed = false): Collection
     {
         return $this->departmentRepository->getAll($withTrashed);
+    }
+
+    public function paginate(bool $withTrashed = false, ?int $perPage = null): LengthAwarePaginator
+    {
+        return $this->departmentRepository->paginate($withTrashed, $perPage);
     }
 
     public function find(int $id): Department

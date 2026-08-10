@@ -3,11 +3,14 @@
 namespace App\Repositories\Interfaces;
 
 use App\Models\Department;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 
 interface DepartmentRepositoryInterface
 {
     public function getAll(bool $withTrashed = false): Collection;
+
+    public function paginate(bool $withTrashed = false, ?int $perPage = null): LengthAwarePaginator;
 
     public function count(): int;
 

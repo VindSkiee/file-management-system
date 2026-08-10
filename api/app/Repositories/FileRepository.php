@@ -4,19 +4,12 @@ namespace App\Repositories;
 
 use App\Models\File;
 use App\Repositories\Interfaces\FileRepositoryInterface;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 
 class FileRepository implements FileRepositoryInterface
 {
-    public function getAll(): Collection
-    {
-        return File::query()
-            ->with(['folder', 'department', 'uploader'])
-            ->latest()
-            ->get();
-    }
-
-    public function getByFolder(?int $folderId, ?string $search = null, ?int $departmentId = null, bool $withTrashed = false): Collection
+    public function paginateByFolder(?int $folderId, ?string $search = null, ?int $departmentId = null, bool $withTrashed = false, ?int $perPage = null): LengthAwarePaginator
     {
         return File::query()
             ->with(['folder', 'department', 'uploader'])
@@ -30,7 +23,7 @@ class FileRepository implements FileRepositoryInterface
             })
             ->when($departmentId !== null, fn ($query) => $query->where('department_id', $departmentId))
             ->latest()
-            ->get();
+            ->paginate($perPage ?? 15);
     }
 
     public function getLatest(int $limit): Collection

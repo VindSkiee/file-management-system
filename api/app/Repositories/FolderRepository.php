@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Models\File;
 use App\Models\Folder;
 use App\Repositories\Interfaces\FolderRepositoryInterface;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 
 class FolderRepository implements FolderRepositoryInterface
@@ -18,13 +19,13 @@ class FolderRepository implements FolderRepositoryInterface
             ->get();
     }
 
-    public function getByParent(?int $parentId, bool $withTrashed = false): Collection
+    public function paginateByParent(?int $parentId, bool $withTrashed = false, ?int $perPage = null): LengthAwarePaginator
     {
         return Folder::query()
             ->when($withTrashed, fn ($query) => $query->withTrashed())
             ->where('parent_id', $parentId)
             ->orderBy('name')
-            ->get();
+            ->paginate($perPage ?? 15);
     }
 
     public function count(): int

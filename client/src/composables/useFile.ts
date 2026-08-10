@@ -28,26 +28,36 @@ export function useFile() {
   const fileDetail = ref<FileItem | null>(null)
   const isLoading = ref(false)
   const error = ref('')
+  const page = ref(1)
+  const lastPage = ref(1)
 
   async function getFiles(
     folderId: number | null = null,
     search = '',
     departmentId: number | null = null,
     withTrashed = false,
+    nextPage = 1,
+    perPage = 15,
   ): Promise<void> {
     isLoading.value = true
     error.value = ''
 
     try {
-      const params: Record<string, string | number | boolean> = {}
+      const params: Record<string, string | number | boolean> = { page: nextPage, per_page: perPage }
 
       if (folderId !== null) params.folder_id = folderId
       if (search.trim() !== '') params.search = search.trim()
       if (departmentId !== null) params.department_id = departmentId
       if (withTrashed) params.trashed = true
 
-      const { data } = await api.get<{ data: FileItem[] }>('/files', { params })
+      const { data } = await api.get<{
+        data: FileItem[]
+        meta: { current_page: number; last_page: number }
+      }>('/files', { params })
+
       files.value = data.data
+      page.value = data.meta?.current_page ?? nextPage
+      lastPage.value = data.meta?.last_page ?? 1
     } catch (err: unknown) {
       error.value = extractErrorMessage(err, 'Gagal memuat file.')
     } finally {
@@ -130,6 +140,8 @@ export function useFile() {
     fileDetail,
     isLoading,
     error,
+    page,
+    lastPage,
     getFiles,
     uploadFile,
     updateFile,

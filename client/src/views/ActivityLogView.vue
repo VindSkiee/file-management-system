@@ -87,11 +87,11 @@ onMounted(() => {
                 <span class="mr-2 inline font-medium text-gray-500 dark:text-gray-400 md:hidden">Tanggal:</span>
                 <span class="text-gray-700 dark:text-gray-200">{{ log.date }}</span>
               </td>
-              <td class="block py-1 md:table-cell md:px-6 md:py-3 text-center">
+              <td class="block py-1 md:table-cell md:px-6 md:py-3 md:text-center">
                 <span class="mr-2 inline font-medium text-gray-500 dark:text-gray-400 md:hidden">Pengguna:</span>
                 <span class="font-medium text-gray-800 dark:text-gray-100">{{ log.user?.name ?? '-' }}</span>
               </td>
-              <td class="block py-1 md:table-cell md:px-6 md:py-3 text-center">
+              <td class="block py-1 md:table-cell md:px-6 md:py-3 md:text-center">
                 <span class="mr-2 inline font-medium text-gray-500 dark:text-gray-400 md:hidden">Aksi:</span>
                 <span
                   class="inline-block rounded px-2 py-0.5 text-xs font-semibold capitalize"
@@ -100,11 +100,11 @@ onMounted(() => {
                   {{ log.action }}
                 </span>
               </td>
-              <td class="block py-1 md:table-cell md:px-6 md:py-3 text-center">
+              <td class="block py-1 md:table-cell md:px-6 md:py-3 md:text-center">
                 <span class="mr-2 inline font-medium text-gray-500 dark:text-gray-400 md:hidden">Tipe:</span>
                 <span class="text-gray-700 dark:text-gray-200">{{ log.entity_type }}</span>
               </td>
-              <td class="block py-1 md:table-cell md:px-6 md:py-3 text-center">
+              <td class="block py-1 md:table-cell md:px-6 md:py-3 md:text-center">
                 <span class="mr-2 inline font-medium text-gray-500 dark:text-gray-400 md:hidden">Nama:</span>
                 <span class="break-words text-gray-700 dark:text-gray-200">{{ log.entity_name }}</span>
               </td>

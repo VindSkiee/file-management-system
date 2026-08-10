@@ -25,7 +25,7 @@ class FolderController extends Controller
         $parentId = $request->integer('parent_id') ?: null;
         $withTrashed = $request->boolean('trashed');
 
-        $folders = $this->folderService->getByParent($parentId, $withTrashed);
+        $folders = $this->folderService->paginateByParent($parentId, $withTrashed, $request->integer('per_page') ?: null);
 
         return FolderResource::collection($folders)->response();
     }
