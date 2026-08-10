@@ -33,6 +33,7 @@ Modul yang tersedia: **Authentication** (Sanctum), **Department Management**, **
 - **File Detail** — Folder, Nama File, Title, Department, Uploaded By, Upload Date + tombol download.
 - **Search & Filter** — Pencarian Nama File / Title dan filter Department (diakses Viewer & Admin).
 - **Dashboard** — 3 kartu statistik (Total Folder / File / Department) + tabel 10 File Terbaru.
+- **Activity Log** — Riwayat aksi (created/updated/deleted/restored) per entitas, hanya untuk Administrator.
 - **RBAC** — Policies Laravel (`viewAny`, `view`, `create`, `update`, `delete`, `download`, `restore`); mutasi data hanya untuk Administrator.
 
 ---
@@ -41,9 +42,12 @@ Modul yang tersedia: **Authentication** (Sanctum), **Department Management**, **
 
 - [x] **Breadcrumb Folder** — Navigasi breadcrumb dinamis (`Root / Sub Folder / ...`) dengan navigasi klik.
 - [x] **Drag & Drop Upload** — Area unggah bergaris putus-putus yang merespons `@dragover`/`@drop`, plus klik-untuk-pilih.
-- [x] **Preview PDF/Image** — Pratinjau langsung menggunakan `<img>` (gambar) dan `<iframe>` (PDF) di modal detail file.
+- [x] **Preview PDF/Image** — Pratinjau `<img>`/`<iframe>` di modal preview terpisah yang bisa ditutup (buka dari tombol "Preview File" di detail file).
+- [x] **Activity Log** — Pencatatan otomatis `created`/`updated`/`deleted`/`restored` via Laravel Observers; halaman viewer khusus Administrator.
 - [x] **Soft Delete** — Semua data yang dihapus dapat dilihat (toggle "Tampilkan Data Terhapus") dan **di-restore**; tidak hilang permanen.
-- [x] **Responsive UI** — Layout adaptif (sidebar desktop, top-bar mobile; grid & tabel dengan `overflow-x-auto`).
+- [x] **Unit Test / Feature Test** — Feature test RBAC folder (`tests/Feature/FolderAccessTest.php`) dengan PHPUnit + `RefreshDatabase` (SQLite in-memory).
+- [x] **Responsive UI** — Layout adaptif (sidebar desktop, top-bar mobile; grid, tabel stacked di HP, modal aman di layar kecil).
+- [x] **Dark Mode** — Toggle Matahari/Bulan berbasis class (`darkMode: 'class'`) dengan preferensi tersimpan di `localStorage`.
 - [x] **Clean Architecture (Service/Repository Pattern)** — Controller bebas dari logika query & storage; seluruh logika bisnis di `Service` dan akses data di `Repository` (terikat via Interface + Dependency Injection).
 - [x] **Search & Filter** — Pencarian `file_name`/`title` + filter department, ter-debounce 300ms.
 - [x] **Docker** — Docker Compose zero-config (PostgreSQL + backend PHP/Composer + frontend Node) di `docker-compose.yml`.
