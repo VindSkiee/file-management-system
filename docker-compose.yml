@@ -1,0 +1,77 @@
+name: fms
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: fms_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: fms_db
+      POSTGRES_USER: fms
+      POSTGRES_PASSWORD: fms_secret
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fms -d fms_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - fms
+
+  backend:
+    build:
+      context: ./docker/backend
+    container_name: fms_backend
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - ./api:/var/www
+    command: sh -c "composer install --no-interaction && php artisan migrate --seed && php artisan serve --host=0.0.0.0 --port=8000"
+    environment:
+      APP_ENV: local
+      APP_DEBUG: "true"
+      # Dev-only key (auto-injected).
+      APP_KEY: "base64:4FmzoMRPkTU5+QbDYFn7qOW8TCkNqG3Oq0QfHcM8Psk="
+      DB_CONNECTION: pgsql
+      DB_HOST: db
+      DB_PORT: "5432"
+      DB_DATABASE: fms_db
+      DB_USERNAME: fms
+      DB_PASSWORD: fms_secret
+      FILESYSTEM_DISK: public
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - fms
+
+  frontend:
+    image: node:22-alpine
+    container_name: fms_frontend
+    restart: unless-stopped
+    working_dir: /app
+    volumes:
+      - ./client:/app
+      - frontend_modules:/app/node_modules
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0 --port 5173"
+    environment:
+      NODE_ENV: development
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    networks:
+      - fms
+
+volumes:
+  db_data:
+  frontend_modules:
+
+networks:
+  fms:
+    driver: bridge

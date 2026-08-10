@@ -46,6 +46,8 @@ Modul yang tersedia: **Authentication** (Sanctum), **Department Management**, **
 - [x] **Responsive UI** — Layout adaptif (sidebar desktop, top-bar mobile; grid & tabel dengan `overflow-x-auto`).
 - [x] **Clean Architecture (Service/Repository Pattern)** — Controller bebas dari logika query & storage; seluruh logika bisnis di `Service` dan akses data di `Repository` (terikat via Interface + Dependency Injection).
 - [x] **Search & Filter** — Pencarian `file_name`/`title` + filter department, ter-debounce 300ms.
+- [x] **Docker** — Docker Compose zero-config (PostgreSQL + backend PHP/Composer + frontend Node) di `docker-compose.yml`.
+- [x] **API Documentation** — Spesifikasi OpenAPI 3.0.0 lengkap di `docs/openapi.yaml`.
 
 ---
 
@@ -117,9 +119,9 @@ Buat database PostgreSQL-nya terlebih dahulu:
 psql -U postgres -c "CREATE DATABASE fms_db;"
 ```
 
-#### (Opsional) Konfigurasi CORS
+#### Konfigurasi CORS
 
-Pastikan `config/cors.php` mengizinkan origin frontend agar request lintas origin berjalan lancar:
+File `api/config/cors.php` sudah dikonfigurasi agar mengizinkan origin frontend **http://localhost:5173** (dengan `supports_credentials: true`, karena frontend memakai `withCredentials`). Tidak perlu diubah kecuali port frontend Anda berbeda:
 
 ```php
 'allowed_origins' => ['http://localhost:5173'],
@@ -183,6 +185,64 @@ npm run dev
 ```
 
 Buka aplikasi di browser: **http://localhost:5173**
+
+---
+
+## 🐳 Menjalankan dengan Docker (Zero-Config)
+
+Selain instalasi manual, seluruh aplikasi dapat dijalankan sekaligus dengan **Docker Compose** — tanpa perlu mengubah `.env` sama sekali (kredensial database & kunci aplikasi di-inject otomatis).
+
+Pastikan **Docker Desktop** sudah berjalan, lalu jalankan dari root proyek:
+
+```bash
+docker-compose up -d
+```
+
+Container yang dibuat (`docker-compose.yml`):
+
+| Service | Image | Port | Keterangan |
+|---|---|---|---|
+| `db` | `postgres:15-alpine` | `5432` | PostgreSQL (db: `fms_db`, user: `fms`, pass: `fms_secret`) |
+| `backend` | `php:8.2-cli` + Composer | `8000` | `composer install` → `migrate --seed` → `php artisan serve` |
+| `frontend` | `node:22-alpine` | `5173` | `npm install` → `npm run dev` |
+
+Setelah container aktif:
+
+```bash
+# Buka aplikasi
+http://localhost:5173
+
+# Lihat log backend
+docker-compose logs -f backend
+
+# Hentikan semua container
+docker-compose down
+
+# Rebuild (jika ada perubahan Dockerfile / dependency baru)
+docker-compose up -d --build
+```
+
+> **Catatan:**
+> - Migration & seeding dijalankan **otomatis pada start pertama** (`php artisan migrate --seed`), sehingga akun login langsung tersedia.
+> - Data database tersimpan di volume `db_data` (tidak hilang saat `docker-compose down`).
+> - Apabila port `5432`/`8000`/`5173` sudah terpakai oleh server lokal, hentikan proses tersebut terlebih dahulu atau sesuaikan mapping port.
+
+---
+
+## 📚 API Documentation (OpenAPI / Swagger)
+
+Spesifikasi API tersedia dalam format **OpenAPI 3.0.0** di **`docs/openapi.yaml`**. Dokumen mencakup skema autentikasi **Sanctum Bearer Token** (plus opsi cookie), skema `multipart/form-data` untuk upload file, serta endpoint krusial:
+
+- `POST /api/login`
+- `GET /api/departments`
+- `GET /api/folders` (parameter `parent_id`, `trashed`)
+- `POST /api/files` (upload file)
+
+Cara melihatnya:
+
+1. Buka file `docs/openapi.yaml`.
+2. Salin isinya ke [Swagger Editor](https://editor.swagger.io/) atau [Stoplight Studio](https://stoplight.io/studio/) untuk pratinjau interaktif.
+3. Untuk mengimpor ke Postman: `Import → OpenAPI → pilih file`.
 
 ---
 

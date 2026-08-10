@@ -1,0 +1,373 @@
+openapi: 3.0.0
+info:
+  title: FMS - File Management System API
+  description: |
+    REST API untuk File Management System (Laravel 11 + Sanctum + PostgreSQL).
+    Mendukung autentikasi Bearer Token, struktur folder hierarkis tanpa batas level,
+    serta manajemen department dan file.
+  version: "1.0.0"
+servers:
+  - url: http://localhost:8000/api
+    description: Local development server
+
+tags:
+  - name: Auth
+    description: Autentikasi & user
+  - name: Departments
+    description: Manajemen department
+  - name: Folders
+    description: Manajemen folder hierarkis
+  - name: Files
+    description: Manajemen file
+
+paths:
+  /login:
+    post:
+      tags:
+        - Auth
+      summary: Login dan menerbitkan token Sanctum
+      description: Endpoint publik (tidak memerlukan autentikasi).
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: Login berhasil
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+        "401":
+          description: Kredensial tidak valid
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Kredensial yang Anda masukkan tidak valid."
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
+  /departments:
+    get:
+      tags:
+        - Departments
+      summary: Daftar department
+      description: |
+        Mengembalikan seluruh department (soft-delete diecualikan kecuali
+        parameter `trashed=true` disertakan).
+      operationId: getDepartments
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: trashed
+          in: query
+          required: false
+          description: Sertakan department yang sudah di-soft-delete.
+          schema:
+            type: boolean
+            default: false
+      responses:
+        "200":
+          description: Daftar department
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Department"
+        "401":
+          description: Unauthenticated
+
+  /folders:
+    get:
+      tags:
+        - Folders
+      summary: Daftar folder berdasarkan parent
+      description: |
+        Mengembalikan anak-anak langsung (direct children) dari folder induk.
+        Kosongkan `parent_id` untuk folder Root (parent NULL). Mendukung
+        hierarki tanpa batas level.
+      operationId: getFolders
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: parent_id
+          in: query
+          required: false
+          description: ID folder induk. Null / tidak disertakan = Root folder.
+          schema:
+            type: integer
+            nullable: true
+        - name: trashed
+          in: query
+          required: false
+          description: Sertakan folder yang sudah di-soft-delete.
+          schema:
+            type: boolean
+            default: false
+      responses:
+        "200":
+          description: Daftar folder
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Folder"
+        "401":
+          description: Unauthenticated
+
+  /files:
+    post:
+      tags:
+        - Files
+      summary: Upload file baru
+      description: |
+        Upload file (multipart/form-data). Hanya Administrator yang diizinkan
+        (403 untuk Viewer). Ukuran maksimal 10MB.
+      operationId: storeFile
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/UploadFilePayload"
+      responses:
+        "201":
+          description: File berhasil diunggah
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/File"
+        "401":
+          description: Unauthenticated
+        "403":
+          description: Hanya Administrator yang dapat mengunggah file
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: Sanctum
+      description: "Token dari response POST /login (access_token), dikirim via header Authorization: Bearer <token>."
+    SanctumCookie:
+      type: apiKey
+      in: cookie
+      name: laravel_session
+      description: Opsional - mode SPA cookie session Laravel/Sanctum (diaktifkan melalui `withCredentials`).
+
+  schemas:
+    Department:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "Human Resources"
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        deleted_at:
+          type: string
+          format: date-time
+          nullable: true
+
+    Folder:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "Laporan 2026"
+        parent_id:
+          type: integer
+          nullable: true
+          example: null
+        children:
+          type: array
+          items:
+            $ref: "#/components/schemas/Folder"
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        deleted_at:
+          type: string
+          format: date-time
+          nullable: true
+
+    File:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: "Laporan Keuangan"
+        file_name:
+          type: string
+          example: "laporan-2026.pdf"
+        folder:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+        department:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+        uploaded_by:
+          type: string
+          nullable: true
+          example: "Admin"
+        upload_date:
+          type: string
+          example: "10 Aug 2026 14:30"
+        file_url:
+          type: string
+          format: uri
+          example: "http://localhost:8000/storage/files/abc123.pdf"
+        download_url:
+          type: string
+          format: uri
+          example: "http://localhost:8000/api/files/1/download"
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        deleted_at:
+          type: string
+          format: date-time
+          nullable: true
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+          example: "Admin"
+        email:
+          type: string
+          format: email
+          example: "admin@example.com"
+        role_id:
+          type: integer
+        role_name:
+          type: string
+          nullable: true
+          example: "Administrator"
+
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: "admin@example.com"
+        password:
+          type: string
+          format: password
+          example: "password"
+
+    LoginResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Login berhasil."
+        access_token:
+          type: string
+          example: "1|abcdefghijklmnopqrstuvwxyz..."
+        token_type:
+          type: string
+          example: "Bearer"
+        user:
+          $ref: "#/components/schemas/User"
+
+    UploadFilePayload:
+      type: object
+      required:
+        - title
+        - department_id
+        - file
+      properties:
+        title:
+          type: string
+          example: "Laporan Keuangan"
+        department_id:
+          type: integer
+          example: 1
+        folder_id:
+          type: integer
+          nullable: true
+          example: 1
+        file:
+          type: string
+          format: binary
+          description: "Dokumen/gambar, maks 10MB. Format: pdf,doc,docx,xls,xlsx,ppt,pptx,txt,csv,jpg,jpeg,png,gif,webp."
+
+    ValidationError:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "The given data was invalid."
+        errors:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+
+  responses:
+    ValidationError:
+      description: Validasi gagal (422)
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ValidationError"
