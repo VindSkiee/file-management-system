@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, reactive, ref } from 'vue'
+import { onMounted, reactive, ref, watch } from 'vue'
 import AppLayout from '@/layouts/AppLayout.vue'
 import BaseModal from '@/components/BaseModal.vue'
 import BreadcrumbNav, { type BreadcrumbItem } from '@/components/BreadcrumbNav.vue'
@@ -7,10 +7,12 @@ import FileDetailModal from '@/components/FileDetailModal.vue'
 import FileUploadModal from '@/components/FileUploadModal.vue'
 import FolderCard from '@/components/FolderCard.vue'
 import { useAuthStore } from '@/stores/authStore'
+import { useDepartment } from '@/composables/useDepartment'
 import { useFile, type FileItem } from '@/composables/useFile'
 import { useFolder, type Folder } from '@/composables/useFolder'
 
 const authStore = useAuthStore()
+const { departments, getDepartments } = useDepartment()
 const {
   folders,
   isLoading: foldersLoading,
@@ -32,6 +34,9 @@ const {
 const currentParentId = ref<number | null>(null)
 const breadcrumbs = ref<BreadcrumbItem[]>([{ id: null, name: 'Root' }])
 
+const searchQuery = ref('')
+const departmentFilter = ref<number | null>(null)
+
 const showFolderModal = ref(false)
 const editingFolderId = ref<number | null>(null)
 const form = reactive({ name: '' })
@@ -44,14 +49,28 @@ const showDetailModal = ref(false)
 const detailFile = ref<FileItem | null>(null)
 
 onMounted(() => {
+  getDepartments()
   loadFolderContents()
+})
+
+let searchTimer: ReturnType<typeof setTimeout> | undefined
+
+watch([searchQuery, departmentFilter], () => {
+  clearTimeout(searchTimer)
+  searchTimer = setTimeout(() => {
+    reloadFiles()
+  }, 300)
 })
 
 async function loadFolderContents(): Promise<void> {
   await Promise.all([
     getFolders(currentParentId.value),
-    getFiles(currentParentId.value),
+    getFiles(currentParentId.value, searchQuery.value, departmentFilter.value),
   ])
+}
+
+function reloadFiles(): void {
+  getFiles(currentParentId.value, searchQuery.value, departmentFilter.value)
 }
 
 function openFolder(folder: Folder): void {
@@ -210,6 +229,37 @@ async function handleFileDownload(file: FileItem): Promise<void> {
         >
           Upload File
         </button>
+      </div>
+
+      <div class="flex flex-col gap-3 border-b px-6 py-4 md:flex-row md:items-center">
+        <div class="relative flex-1">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+          </svg>
+          <input
+            v-model="searchQuery"
+            type="text"
+            placeholder="Cari Nama File / Title..."
+            class="w-full rounded border border-gray-300 py-2 pl-9 pr-3 text-sm focus:border-blue-500 focus:outline-none"
+          />
+        </div>
+
+        <select
+          v-model="departmentFilter"
+          class="w-full rounded border border-gray-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none md:w-56"
+        >
+          <option :value="null">Semua Department</option>
+          <option v-for="dept in departments" :key="dept.id" :value="dept.id">
+            {{ dept.name }}
+          </option>
+        </select>
       </div>
 
       <p v-if="filesError" class="border-b border-gray-100 px-6 py-3 text-sm text-red-600">

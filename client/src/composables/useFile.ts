@@ -28,12 +28,21 @@ export function useFile() {
   const isLoading = ref(false)
   const error = ref('')
 
-  async function getFiles(folderId: number | null = null): Promise<void> {
+  async function getFiles(
+    folderId: number | null = null,
+    search = '',
+    departmentId: number | null = null,
+  ): Promise<void> {
     isLoading.value = true
     error.value = ''
 
     try {
-      const params = folderId !== null ? { folder_id: folderId } : {}
+      const params: Record<string, string | number> = {}
+
+      if (folderId !== null) params.folder_id = folderId
+      if (search.trim() !== '') params.search = search.trim()
+      if (departmentId !== null) params.department_id = departmentId
+
       const { data } = await api.get<{ data: FileItem[] }>('/files', { params })
       files.value = data.data
     } catch (err: unknown) {

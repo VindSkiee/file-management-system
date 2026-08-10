@@ -26,9 +26,9 @@ class FileService
         return $this->fileRepository->getAll();
     }
 
-    public function getByFolder(?int $folderId): Collection
+    public function getByFolder(?int $folderId, ?string $search = null, ?int $departmentId = null): Collection
     {
-        return $this->fileRepository->getByFolder($folderId);
+        return $this->fileRepository->getByFolder($folderId, $search, $departmentId);
     }
 
     public function find(int $id): File

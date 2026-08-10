@@ -23,8 +23,10 @@ class FileController extends Controller
         Gate::authorize('viewAny', File::class);
 
         $folderId = $request->integer('folder_id') ?: null;
+        $search = $request->query('search') ?: null;
+        $departmentId = $request->integer('department_id') ?: null;
 
-        $files = $this->fileService->getByFolder($folderId);
+        $files = $this->fileService->getByFolder($folderId, $search, $departmentId);
 
         return FileResource::collection($files)->response();
     }

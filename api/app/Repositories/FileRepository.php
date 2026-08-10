@@ -16,12 +16,21 @@ class FileRepository implements FileRepositoryInterface
             ->get();
     }
 
-    public function getByFolder(?int $folderId): Collection
+    public function getByFolder(?int $folderId, ?string $search = null, ?int $departmentId = null): Collection
     {
         // NULL folder_id resolves to "WHERE folder_id IS NULL" (root files).
         return File::query()
             ->with(['folder', 'department', 'uploader'])
             ->where('folder_id', $folderId)
+            ->when($search !== null && $search !== '', function ($query) use ($search) {
+                // Nested closure keeps the file_name OR title match from
+                // overriding the folder_id / department_id filters.
+                $query->where(function ($subQuery) use ($search) {
+                    $subQuery->where('file_name', 'like', "%{$search}%")
+                        ->orWhere('title', 'like', "%{$search}%");
+                });
+            })
+            ->when($departmentId !== null, fn ($query) => $query->where('department_id', $departmentId))
             ->latest()
             ->get();
     }

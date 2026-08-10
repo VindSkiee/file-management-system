@@ -9,7 +9,7 @@ interface FileRepositoryInterface
 {
     public function getAll(): Collection;
 
-    public function getByFolder(?int $folderId): Collection;
+    public function getByFolder(?int $folderId, ?string $search = null, ?int $departmentId = null): Collection;
 
     public function getLatest(int $limit): Collection;
 
