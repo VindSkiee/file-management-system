@@ -13,7 +13,9 @@ return new class extends Migration
     {
         Schema::create('files', function (Blueprint $table) {
             $table->id();
+            // Nullable: files can be uploaded at the root (no folder).
             $table->foreignId('folder_id')
+                ->nullable()
                 ->constrained('folders')
                 ->cascadeOnDelete();
             $table->foreignId('department_id')
