@@ -9,6 +9,7 @@ use App\Models\Folder;
 use App\Services\FolderService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
 
 class FolderController extends Controller
@@ -48,7 +49,7 @@ class FolderController extends Controller
         return (new FolderResource($folder))->response();
     }
 
-    public function destroy(int $id): JsonResponse
+    public function destroy(int $id): Response
     {
         $folder = $this->folderService->find($id);
         Gate::authorize('delete', $folder);

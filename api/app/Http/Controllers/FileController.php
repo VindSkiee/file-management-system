@@ -9,8 +9,9 @@ use App\Models\File;
 use App\Services\FileService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class FileController extends Controller
 {
@@ -59,7 +60,7 @@ class FileController extends Controller
         return (new FileResource($file))->response();
     }
 
-    public function destroy(int $id): JsonResponse
+    public function destroy(int $id): Response
     {
         $file = $this->fileService->find($id);
         Gate::authorize('delete', $file);
@@ -79,7 +80,7 @@ class FileController extends Controller
         return (new FileResource($file))->response();
     }
 
-    public function download(int $id): BinaryFileResponse
+    public function download(int $id): StreamedResponse
     {
         $file = $this->fileService->find($id);
         Gate::authorize('download', $file);

@@ -3,6 +3,8 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -15,33 +17,33 @@ return Application::configure(basePath: dirname(__DIR__))
         //
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        $exceptions->respond(function (\Illuminate\Http\Response $response, \Throwable $exception, \Illuminate\Http\Request $request) {
+        $exceptions->respond(function (Response $response, Throwable $exception, Request $request) {
             if ($request->is('api/*')) {
                 if ($response->status() === 419) {
                     return response()->json([
                         'message' => 'Session expired. Please login again.',
                     ], 419);
                 }
-                
+
                 if ($response->status() === 401) {
                     return response()->json([
                         'message' => 'Unauthenticated.',
                     ], 401);
                 }
-                
+
                 if ($response->status() === 403) {
                     return response()->json([
                         'message' => 'Forbidden. You do not have permission to access this resource.',
                     ], 403);
                 }
-                
+
                 if ($response->status() === 404) {
                     return response()->json([
                         'message' => 'Resource not found.',
                     ], 404);
                 }
             }
-            
+
             return $response;
         });
     })->create();

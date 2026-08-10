@@ -9,6 +9,7 @@ use App\Models\Department;
 use App\Services\DepartmentService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
 
 class DepartmentController extends Controller
@@ -53,7 +54,7 @@ class DepartmentController extends Controller
         return (new DepartmentResource($department))->response();
     }
 
-    public function destroy(int $id): JsonResponse
+    public function destroy(int $id): Response
     {
         $department = $this->departmentService->find($id);
         Gate::authorize('delete', $department);

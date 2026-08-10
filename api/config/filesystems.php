@@ -39,7 +39,8 @@ return [
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
-            'url' => env('APP_URL').'/storage',
+            // Relative URL agar selalu memakai host request (port) saat ini.
+            'url' => '/storage',
             'visibility' => 'public',
             'throw' => false,
         ],

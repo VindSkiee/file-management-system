@@ -9,7 +9,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class FileService
 {
@@ -89,7 +89,7 @@ class FileService
         $this->fileRepository->restore($file);
     }
 
-    public function download(int $id): BinaryFileResponse
+    public function download(int $id): StreamedResponse
     {
         $file = $this->findOrFail($id);
 
