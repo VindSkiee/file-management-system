@@ -12,7 +12,7 @@ class DepartmentRepository implements DepartmentRepositoryInterface
     {
         return Department::query()
             ->when($withTrashed, fn ($query) => $query->withTrashed())
-            ->orderBy('name')
+            ->orderBy('id')
             ->get();
     }
 

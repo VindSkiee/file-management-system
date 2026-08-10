@@ -311,8 +311,8 @@ async function handleFileDownload(file: FileItem): Promise<void> {
               <th class="px-6 py-3 font-semibold text-gray-600">Title</th>
               <th class="px-6 py-3 font-semibold text-gray-600">Department</th>
               <th class="px-6 py-3 font-semibold text-gray-600">Nama File</th>
-              <th class="px-6 py-3 font-semibold text-gray-600">Upload Date</th>
-              <th class="px-6 py-3 text-right font-semibold text-gray-600">Aksi</th>
+              <th class="px-6 py-3 text-center font-semibold text-gray-600">Upload Date</th>
+              <th class="px-6 py-3 text-center font-semibold text-gray-600">Aksi</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-200">
@@ -345,12 +345,12 @@ async function handleFileDownload(file: FileItem): Promise<void> {
                   {{ file.file_name }}
                 </span>
               </td>
-              <td class="block py-1 md:table-cell md:px-6 md:py-3">
+              <td class="block py-1 text-center md:table-cell md:px-6 md:py-3">
                 <span class="mr-2 inline font-medium text-gray-500 md:hidden">Upload Date:</span>
                 <span class="text-gray-700">{{ file.upload_date }}</span>
               </td>
-              <td class="block pt-1 md:table-cell md:px-6 md:py-3">
-                <div class="flex flex-wrap gap-2 md:justify-end">
+              <td class="block pt-1 text-center md:table-cell md:px-6 md:py-3">
+                <div class="flex flex-wrap justify-center gap-2">
                   <button
                     v-if="file.deleted_at"
                     @click="handleFileRestore(file)"
