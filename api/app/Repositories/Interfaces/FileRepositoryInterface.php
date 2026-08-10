@@ -9,6 +9,8 @@ interface FileRepositoryInterface
 {
     public function getAll(): Collection;
 
+    public function getByFolder(?int $folderId): Collection;
+
     public function getLatest(int $limit): Collection;
 
     public function count(): int;

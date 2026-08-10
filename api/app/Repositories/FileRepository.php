@@ -16,6 +16,16 @@ class FileRepository implements FileRepositoryInterface
             ->get();
     }
 
+    public function getByFolder(?int $folderId): Collection
+    {
+        // NULL folder_id resolves to "WHERE folder_id IS NULL" (root files).
+        return File::query()
+            ->with(['folder', 'department', 'uploader'])
+            ->where('folder_id', $folderId)
+            ->latest()
+            ->get();
+    }
+
     public function getLatest(int $limit): Collection
     {
         return File::query()

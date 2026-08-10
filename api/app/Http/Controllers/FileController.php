@@ -8,6 +8,7 @@ use App\Http\Resources\FileResource;
 use App\Models\File;
 use App\Services\FileService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
@@ -17,11 +18,13 @@ class FileController extends Controller
         protected FileService $fileService,
     ) {}
 
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
         Gate::authorize('viewAny', File::class);
 
-        $files = $this->fileService->getAll();
+        $folderId = $request->integer('folder_id') ?: null;
+
+        $files = $this->fileService->getByFolder($folderId);
 
         return FileResource::collection($files)->response();
     }
