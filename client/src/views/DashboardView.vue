@@ -83,7 +83,7 @@ onMounted(() => {
               <th class="px-6 py-3 font-semibold text-gray-600 dark:text-gray-300">Title</th>
               <th class="px-6 py-3 font-semibold text-gray-600 dark:text-gray-300">Department</th>
               <th class="px-6 py-3 font-semibold text-gray-600 dark:text-gray-300">Nama File</th>
-              <th class="px-6 py-3 font-semibold text-gray-600 dark:text-gray-300">Upload Date</th>
+              <th class="px-6 py-3 font-semibold text-gray-600 dark:text-gray-300 text-center">Upload Date</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
@@ -104,7 +104,7 @@ onMounted(() => {
                 <span class="mr-2 inline font-medium text-gray-500 dark:text-gray-400 md:hidden">Nama File:</span>
                 <span class="font-medium text-gray-800 dark:text-gray-100">{{ file.file_name }}</span>
               </td>
-              <td class="block py-1 md:table-cell md:px-6 md:py-3">
+              <td class="block py-1 md:table-cell md:px-6 md:py-3 text-center">
                 <span class="mr-2 inline font-medium text-gray-500 dark:text-gray-400 md:hidden">Upload Date:</span>
                 <span class="text-gray-700 dark:text-gray-200">{{ file.upload_date }}</span>
               </td>

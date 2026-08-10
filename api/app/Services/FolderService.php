@@ -58,12 +58,14 @@ class FolderService
     {
         $folder = $this->findOrFail($id);
 
-        $this->folderRepository->delete($folder);
+        $descendantIds = $this->folderRepository->getDescendantIds($folder->id);
+        $this->folderRepository->deleteWithDescendants($folder, $descendantIds);
     }
 
     public function restore(Folder $folder): void
     {
-        $this->folderRepository->restore($folder);
+        $descendantIds = $this->folderRepository->getDescendantIds($folder->id);
+        $this->folderRepository->restoreWithDescendants($folder, $descendantIds);
     }
 
     private function findOrFail(int $id): Folder

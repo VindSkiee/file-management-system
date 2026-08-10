@@ -8,10 +8,11 @@ const router = useRouter()
 const authStore = useAuthStore()
 const { isDark, toggleDarkMode } = useDarkMode()
 
-const navItems = [
+const navItems: { label: string; to: { name: string }; adminOnly?: boolean }[] = [
   { label: 'Dashboard', to: { name: 'dashboard' } },
   { label: 'Folders', to: { name: 'folders' } },
   { label: 'Departments', to: { name: 'departments' } },
+  { label: 'Activity Log', to: { name: 'activity-logs' }, adminOnly: true },
 ]
 
 async function handleLogout(): Promise<void> {
@@ -28,15 +29,16 @@ async function handleLogout(): Promise<void> {
       </div>
 
       <nav class="flex-1 space-y-1 p-4">
-        <router-link
-          v-for="item in navItems"
-          :key="item.label"
-          :to="item.to"
-          class="block rounded px-3 py-2 text-sm font-medium transition"
-          :class="route.name === item.to.name ? 'bg-gray-800 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white'"
-        >
-          {{ item.label }}
-        </router-link>
+        <template v-for="item in navItems" :key="item.label">
+          <router-link
+            v-if="!item.adminOnly || authStore.isAdmin"
+            :to="item.to"
+            class="block rounded px-3 py-2 text-sm font-medium transition"
+            :class="route.name === item.to.name ? 'bg-gray-800 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white'"
+          >
+            {{ item.label }}
+          </router-link>
+        </template>
       </nav>
 
       <div class="border-t border-gray-800 p-4">
@@ -109,17 +111,18 @@ async function handleLogout(): Promise<void> {
         </header>
 
         <nav class="flex space-x-2 overflow-x-auto border-b bg-white px-4 py-2 transition-colors duration-200 dark:border-gray-700 dark:bg-gray-800">
-          <router-link
-            v-for="item in navItems"
-            :key="item.label"
-            :to="item.to"
-            class="shrink-0 rounded px-3 py-1.5 text-sm font-medium transition"
-            :class="route.name === item.to.name
-              ? 'bg-blue-600 text-white'
-              : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'"
-          >
-            {{ item.label }}
-          </router-link>
+          <template v-for="item in navItems" :key="item.label">
+            <router-link
+              v-if="!item.adminOnly || authStore.isAdmin"
+              :to="item.to"
+              class="shrink-0 rounded px-3 py-1.5 text-sm font-medium transition"
+              :class="route.name === item.to.name
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'"
+            >
+              {{ item.label }}
+            </router-link>
+          </template>
         </nav>
       </div>
 

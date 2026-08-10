@@ -2,9 +2,11 @@
 
 namespace App\Providers;
 
+use App\Repositories\ActivityLogRepository;
 use App\Repositories\DepartmentRepository;
 use App\Repositories\FileRepository;
 use App\Repositories\FolderRepository;
+use App\Repositories\Interfaces\ActivityLogRepositoryInterface;
 use App\Repositories\Interfaces\DepartmentRepositoryInterface;
 use App\Repositories\Interfaces\FileRepositoryInterface;
 use App\Repositories\Interfaces\FolderRepositoryInterface;
@@ -20,6 +22,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(DepartmentRepositoryInterface::class, DepartmentRepository::class);
         $this->app->bind(FolderRepositoryInterface::class, FolderRepository::class);
         $this->app->bind(FileRepositoryInterface::class, FileRepository::class);
+        $this->app->bind(ActivityLogRepositoryInterface::class, ActivityLogRepository::class);
     }
 
     /**

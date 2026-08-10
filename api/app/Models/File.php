@@ -32,7 +32,8 @@ class File extends Model
      */
     public function folder(): BelongsTo
     {
-        return $this->belongsTo(Folder::class);
+        // withTrashed: nama folder tetap ter-resolve walau folder di-soft-delete.
+        return $this->belongsTo(Folder::class)->withTrashed();
     }
 
     /**
@@ -42,7 +43,8 @@ class File extends Model
      */
     public function department(): BelongsTo
     {
-        return $this->belongsTo(Department::class);
+        // withTrashed: nama department tetap ter-resolve walau di-soft-delete.
+        return $this->belongsTo(Department::class)->withTrashed();
     }
 
     /**

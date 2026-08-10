@@ -6,6 +6,7 @@ use App\Models\Department;
 use App\Repositories\Interfaces\DepartmentRepositoryInterface;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Collection;
+use Illuminate\Validation\ValidationException;
 
 class DepartmentService
 {
@@ -49,6 +50,12 @@ class DepartmentService
     public function delete(int $id): void
     {
         $department = $this->findOrFail($id);
+
+        if ($department->files()->exists()) {
+            throw ValidationException::withMessages([
+                'department' => 'Tidak dapat menghapus department yang masih memiliki file. Pindahkan atau hapus file tersebut terlebih dahulu.',
+            ]);
+        }
 
         $this->departmentRepository->delete($department);
     }

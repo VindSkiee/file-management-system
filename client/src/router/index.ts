@@ -30,6 +30,12 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
+      path: '/activity-logs',
+      name: 'activity-logs',
+      component: () => import('@/views/ActivityLogView.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true },
+    },
+    {
       path: '/',
       redirect: { name: 'dashboard' },
     },
@@ -50,6 +56,10 @@ router.beforeEach(async (to) => {
 
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
     return { name: 'login' }
+  }
+
+  if (to.meta.requiresAdmin && !authStore.isAdmin) {
+    return { name: 'dashboard' }
   }
 
   if (to.meta.guest && authStore.isAuthenticated) {

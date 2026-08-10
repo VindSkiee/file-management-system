@@ -24,4 +24,15 @@ interface FolderRepositoryInterface
     public function delete(Folder $folder): bool;
 
     public function restore(Folder $folder): bool;
+
+    /**
+     * Collect every descendant folder id (recursive, including trashed).
+     *
+     * @return array<int, int>
+     */
+    public function getDescendantIds(int $folderId): array;
+
+    public function deleteWithDescendants(Folder $folder, array $descendantIds): bool;
+
+    public function restoreWithDescendants(Folder $folder, array $descendantIds): bool;
 }

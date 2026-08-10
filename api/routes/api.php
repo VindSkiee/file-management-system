@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DepartmentController;
@@ -24,6 +25,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [AuthController::class, 'me']);
 
     Route::get('/dashboard', [DashboardController::class, 'index']);
+    Route::get('/activity-logs', [ActivityLogController::class, 'index']);
 
     Route::apiResource('departments', DepartmentController::class);
     Route::post('/departments/{department}/restore', [DepartmentController::class, 'restore'])->name('departments.restore');
