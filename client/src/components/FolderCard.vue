@@ -10,11 +10,16 @@ const emit = defineEmits<{
   open: [folder: Folder]
   rename: [folder: Folder]
   remove: [folder: Folder]
+  restore: [folder: Folder]
 }>()
 </script>
 
 <template>
-  <div class="flex flex-col rounded-lg border border-gray-200 bg-white p-5 shadow-sm transition hover:shadow-md">
+  <div
+    :class="folder.deleted_at
+      ? 'flex flex-col rounded-lg border border-red-200 bg-red-50 p-5 shadow-sm'
+      : 'flex flex-col rounded-lg border border-gray-200 bg-white p-5 shadow-sm transition hover:shadow-md'"
+  >
     <button
       type="button"
       class="flex w-full flex-col items-center"
@@ -35,33 +40,55 @@ const emit = defineEmits<{
         />
       </svg>
 
-      <span class="mt-3 w-full truncate text-center text-sm font-medium text-gray-800">
+      <span
+        :class="folder.deleted_at
+          ? 'mt-3 w-full truncate text-center text-sm font-medium text-gray-400 line-through'
+          : 'mt-3 w-full truncate text-center text-sm font-medium text-gray-800'"
+      >
         {{ folder.name }}
       </span>
     </button>
 
-    <div v-if="isAdmin" class="mt-4 flex justify-center gap-2 border-t border-gray-100 pt-3">
+    <div
+      v-if="isAdmin"
+      class="mt-4 flex justify-center gap-2 border-t pt-3"
+      :class="folder.deleted_at ? 'border-red-100' : 'border-gray-100'"
+    >
       <button
+        v-if="folder.deleted_at"
         type="button"
-        @click="emit('rename', folder)"
-        class="inline-flex items-center gap-1 rounded bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-600 transition hover:bg-blue-100"
+        @click="emit('restore', folder)"
+        class="inline-flex items-center gap-1 rounded bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-600 transition hover:bg-emerald-100"
       >
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-3.5 w-3.5">
-          <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" />
         </svg>
-        Rename
+        Restore
       </button>
 
-      <button
-        type="button"
-        @click="emit('remove', folder)"
-        class="inline-flex items-center gap-1 rounded bg-red-50 px-2.5 py-1 text-xs font-medium text-red-600 transition hover:bg-red-100"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-3.5 w-3.5">
-          <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-        </svg>
-        Delete
-      </button>
+      <template v-else>
+        <button
+          type="button"
+          @click="emit('rename', folder)"
+          class="inline-flex items-center gap-1 rounded bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-600 transition hover:bg-blue-100"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-3.5 w-3.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
+          </svg>
+          Rename
+        </button>
+
+        <button
+          type="button"
+          @click="emit('remove', folder)"
+          class="inline-flex items-center gap-1 rounded bg-red-50 px-2.5 py-1 text-xs font-medium text-red-600 transition hover:bg-red-100"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-3.5 w-3.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+          </svg>
+          Delete
+        </button>
+      </template>
     </div>
   </div>
 </template>

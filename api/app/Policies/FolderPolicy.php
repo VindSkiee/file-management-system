@@ -31,4 +31,9 @@ class FolderPolicy extends BasePolicy
     {
         return $this->isAdministrator($user);
     }
+
+    public function restore(User $user, Folder $folder): bool
+    {
+        return $this->isAdministrator($user);
+    }
 }

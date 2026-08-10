@@ -26,14 +26,25 @@ class FileService
         return $this->fileRepository->getAll();
     }
 
-    public function getByFolder(?int $folderId, ?string $search = null, ?int $departmentId = null): Collection
+    public function getByFolder(?int $folderId, ?string $search = null, ?int $departmentId = null, bool $withTrashed = false): Collection
     {
-        return $this->fileRepository->getByFolder($folderId, $search, $departmentId);
+        return $this->fileRepository->getByFolder($folderId, $search, $departmentId, $withTrashed);
     }
 
     public function find(int $id): File
     {
         return $this->findOrFail($id);
+    }
+
+    public function findWithTrashed(int $id): File
+    {
+        $file = $this->fileRepository->findWithTrashed($id);
+
+        if ($file === null) {
+            throw (new ModelNotFoundException)->setModel(File::class, $id);
+        }
+
+        return $file;
     }
 
     public function create(array $data, UploadedFile $upload): File
@@ -71,6 +82,11 @@ class FileService
         $file = $this->findOrFail($id);
 
         $this->fileRepository->delete($file);
+    }
+
+    public function restore(File $file): void
+    {
+        $this->fileRepository->restore($file);
     }
 
     public function download(int $id): BinaryFileResponse

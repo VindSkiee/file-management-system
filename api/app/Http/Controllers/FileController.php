@@ -25,8 +25,9 @@ class FileController extends Controller
         $folderId = $request->integer('folder_id') ?: null;
         $search = $request->query('search') ?: null;
         $departmentId = $request->integer('department_id') ?: null;
+        $withTrashed = $request->boolean('trashed');
 
-        $files = $this->fileService->getByFolder($folderId, $search, $departmentId);
+        $files = $this->fileService->getByFolder($folderId, $search, $departmentId, $withTrashed);
 
         return FileResource::collection($files)->response();
     }
@@ -66,6 +67,16 @@ class FileController extends Controller
         $this->fileService->delete($id);
 
         return response()->noContent();
+    }
+
+    public function restore(int $id): JsonResponse
+    {
+        $file = $this->fileService->findWithTrashed($id);
+        Gate::authorize('restore', $file);
+
+        $this->fileService->restore($file);
+
+        return (new FileResource($file))->response();
     }
 
     public function download(int $id): BinaryFileResponse

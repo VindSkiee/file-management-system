@@ -16,11 +16,12 @@ class FileRepository implements FileRepositoryInterface
             ->get();
     }
 
-    public function getByFolder(?int $folderId, ?string $search = null, ?int $departmentId = null): Collection
+    public function getByFolder(?int $folderId, ?string $search = null, ?int $departmentId = null, bool $withTrashed = false): Collection
     {
         // NULL folder_id resolves to "WHERE folder_id IS NULL" (root files).
         return File::query()
             ->with(['folder', 'department', 'uploader'])
+            ->when($withTrashed, fn ($query) => $query->withTrashed())
             ->where('folder_id', $folderId)
             ->when($search !== null && $search !== '', function ($query) use ($search) {
                 // Nested closure keeps the file_name OR title match from
@@ -56,6 +57,14 @@ class FileRepository implements FileRepositoryInterface
             ->find($id);
     }
 
+    public function findWithTrashed(int $id): ?File
+    {
+        return File::query()
+            ->with(['folder', 'department', 'uploader'])
+            ->withTrashed()
+            ->find($id);
+    }
+
     public function create(array $data): File
     {
         return File::query()->create($data);
@@ -73,5 +82,10 @@ class FileRepository implements FileRepositoryInterface
         // Eloquent soft delete: the physical file stays on disk until a force
         // delete is explicitly requested.
         return (bool) $file->delete();
+    }
+
+    public function restore(File $file): bool
+    {
+        return (bool) $file->restore();
     }
 }

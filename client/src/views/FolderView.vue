@@ -21,6 +21,7 @@ const {
   createFolder,
   updateFolder,
   deleteFolder,
+  restoreFolder,
 } = useFolder()
 const {
   files,
@@ -28,6 +29,7 @@ const {
   error: filesError,
   getFiles,
   deleteFile,
+  restoreFile,
   downloadFile,
 } = useFile()
 
@@ -36,6 +38,7 @@ const breadcrumbs = ref<BreadcrumbItem[]>([{ id: null, name: 'Root' }])
 
 const searchQuery = ref('')
 const departmentFilter = ref<number | null>(null)
+const showTrashed = ref(false)
 
 const showFolderModal = ref(false)
 const editingFolderId = ref<number | null>(null)
@@ -62,15 +65,19 @@ watch([searchQuery, departmentFilter], () => {
   }, 300)
 })
 
+watch(showTrashed, () => {
+  loadFolderContents()
+})
+
 async function loadFolderContents(): Promise<void> {
   await Promise.all([
-    getFolders(currentParentId.value),
-    getFiles(currentParentId.value, searchQuery.value, departmentFilter.value),
+    getFolders(currentParentId.value, showTrashed.value),
+    getFiles(currentParentId.value, searchQuery.value, departmentFilter.value, showTrashed.value),
   ])
 }
 
 function reloadFiles(): void {
-  getFiles(currentParentId.value, searchQuery.value, departmentFilter.value)
+  getFiles(currentParentId.value, searchQuery.value, departmentFilter.value, showTrashed.value)
 }
 
 function openFolder(folder: Folder): void {
@@ -140,6 +147,11 @@ async function handleFolderDelete(folder: Folder): Promise<void> {
   if (ok) await loadFolderContents()
 }
 
+async function handleFolderRestore(folder: Folder): Promise<void> {
+  const ok = await restoreFolder(folder.id)
+  if (ok) await loadFolderContents()
+}
+
 function openCreateFile(): void {
   editingFile.value = null
   showFileModal.value = true
@@ -167,6 +179,11 @@ async function handleFileDelete(file: FileItem): Promise<void> {
   if (ok) await loadFolderContents()
 }
 
+async function handleFileRestore(file: FileItem): Promise<void> {
+  const ok = await restoreFile(file.id)
+  if (ok) await loadFolderContents()
+}
+
 async function handleFileDownload(file: FileItem): Promise<void> {
   await downloadFile(file)
 }
@@ -177,13 +194,27 @@ async function handleFileDownload(file: FileItem): Promise<void> {
     <div class="flex flex-wrap items-center justify-between gap-4">
       <BreadcrumbNav :items="breadcrumbs" @navigate="navigateTo" />
 
-      <button
-        v-if="authStore.isAdmin"
-        @click="openCreateFolder"
-        class="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
-      >
-        Create Folder
-      </button>
+      <div class="flex flex-wrap items-center gap-4">
+        <label
+          v-if="authStore.isAdmin"
+          class="flex cursor-pointer items-center gap-2 text-sm text-gray-600"
+        >
+          <input
+            v-model="showTrashed"
+            type="checkbox"
+            class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+          />
+          Tampilkan Data Terhapus
+        </label>
+
+        <button
+          v-if="authStore.isAdmin"
+          @click="openCreateFolder"
+          class="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
+        >
+          Create Folder
+        </button>
+      </div>
     </div>
 
     <p v-if="foldersError" class="mt-4 rounded bg-red-50 px-4 py-3 text-sm text-red-600">
@@ -216,6 +247,7 @@ async function handleFileDownload(file: FileItem): Promise<void> {
         @open="openFolder"
         @rename="openRename"
         @remove="handleFolderDelete"
+        @restore="handleFolderRestore"
       />
     </div>
 
@@ -283,38 +315,64 @@ async function handleFileDownload(file: FileItem): Promise<void> {
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-200">
-            <tr v-for="file in files" :key="file.id" class="hover:bg-gray-50">
-              <td class="px-6 py-3 font-medium text-gray-800">{{ file.file_name }}</td>
-              <td class="px-6 py-3 text-gray-700">{{ file.title }}</td>
+            <tr
+              v-for="file in files"
+              :key="file.id"
+              :class="file.deleted_at ? 'bg-red-50' : 'hover:bg-gray-50'"
+            >
+              <td
+                :class="file.deleted_at
+                  ? 'px-6 py-3 font-medium text-gray-400 line-through'
+                  : 'px-6 py-3 font-medium text-gray-800'"
+              >
+                {{ file.file_name }}
+              </td>
+              <td
+                :class="file.deleted_at
+                  ? 'px-6 py-3 text-gray-400 line-through'
+                  : 'px-6 py-3 text-gray-700'"
+              >
+                {{ file.title }}
+              </td>
               <td class="px-6 py-3 text-gray-700">{{ file.department?.name ?? '-' }}</td>
               <td class="px-6 py-3">
                 <div class="flex flex-wrap justify-end gap-2">
                   <button
-                    @click="openFileDetail(file)"
-                    class="rounded bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-600 transition hover:bg-blue-100"
-                  >
-                    View Detail
-                  </button>
-                  <button
-                    @click="handleFileDownload(file)"
+                    v-if="file.deleted_at"
+                    @click="handleFileRestore(file)"
                     class="rounded bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-600 transition hover:bg-emerald-100"
                   >
-                    Download
+                    Restore
                   </button>
-                  <button
-                    v-if="authStore.isAdmin"
-                    @click="openEditFile(file)"
-                    class="rounded bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-600 transition hover:bg-amber-100"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    v-if="authStore.isAdmin"
-                    @click="handleFileDelete(file)"
-                    class="rounded bg-red-50 px-2.5 py-1 text-xs font-medium text-red-600 transition hover:bg-red-100"
-                  >
-                    Delete
-                  </button>
+
+                  <template v-else>
+                    <button
+                      @click="openFileDetail(file)"
+                      class="rounded bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-600 transition hover:bg-blue-100"
+                    >
+                      View Detail
+                    </button>
+                    <button
+                      @click="handleFileDownload(file)"
+                      class="rounded bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-600 transition hover:bg-emerald-100"
+                    >
+                      Download
+                    </button>
+                    <button
+                      v-if="authStore.isAdmin"
+                      @click="openEditFile(file)"
+                      class="rounded bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-600 transition hover:bg-amber-100"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      v-if="authStore.isAdmin"
+                      @click="handleFileDelete(file)"
+                      class="rounded bg-red-50 px-2.5 py-1 text-xs font-medium text-red-600 transition hover:bg-red-100"
+                    >
+                      Delete
+                    </button>
+                  </template>
                 </div>
               </td>
             </tr>

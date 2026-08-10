@@ -8,6 +8,7 @@ use App\Http\Resources\DepartmentResource;
 use App\Models\Department;
 use App\Services\DepartmentService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
 class DepartmentController extends Controller
@@ -16,11 +17,11 @@ class DepartmentController extends Controller
         protected DepartmentService $departmentService,
     ) {}
 
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
         Gate::authorize('viewAny', Department::class);
 
-        $departments = $this->departmentService->getAll();
+        $departments = $this->departmentService->getAll($request->boolean('trashed'));
 
         return DepartmentResource::collection($departments)->response();
     }
@@ -60,5 +61,15 @@ class DepartmentController extends Controller
         $this->departmentService->delete($id);
 
         return response()->noContent();
+    }
+
+    public function restore(int $id): JsonResponse
+    {
+        $department = $this->departmentService->findWithTrashed($id);
+        Gate::authorize('restore', $department);
+
+        $this->departmentService->restore($department);
+
+        return (new DepartmentResource($department))->response();
     }
 }

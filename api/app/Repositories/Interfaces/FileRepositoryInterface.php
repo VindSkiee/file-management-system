@@ -9,7 +9,7 @@ interface FileRepositoryInterface
 {
     public function getAll(): Collection;
 
-    public function getByFolder(?int $folderId, ?string $search = null, ?int $departmentId = null): Collection;
+    public function getByFolder(?int $folderId, ?string $search = null, ?int $departmentId = null, bool $withTrashed = false): Collection;
 
     public function getLatest(int $limit): Collection;
 
@@ -17,9 +17,13 @@ interface FileRepositoryInterface
 
     public function find(int $id): ?File;
 
+    public function findWithTrashed(int $id): ?File;
+
     public function create(array $data): File;
 
     public function update(File $file, array $data): File;
 
     public function delete(File $file): bool;
+
+    public function restore(File $file): bool;
 }

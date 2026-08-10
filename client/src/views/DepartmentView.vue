@@ -1,18 +1,31 @@
 <script setup lang="ts">
-import { onMounted, reactive, ref } from 'vue'
+import { onMounted, reactive, ref, watch } from 'vue'
 import AppLayout from '@/layouts/AppLayout.vue'
 import { useAuthStore } from '@/stores/authStore'
 import { useDepartment, type Department } from '@/composables/useDepartment'
 
 const authStore = useAuthStore()
-const { departments, isLoading, error, getDepartments, createDepartment, updateDepartment, deleteDepartment } =
-  useDepartment()
+const {
+  departments,
+  isLoading,
+  error,
+  getDepartments,
+  createDepartment,
+  updateDepartment,
+  deleteDepartment,
+  restoreDepartment,
+} = useDepartment()
 
+const showTrashed = ref(false)
 const showModal = ref(false)
 const editingId = ref<number | null>(null)
 const form = reactive({ name: '' })
 const submitting = ref(false)
 const modalError = ref('')
+
+watch(showTrashed, () => {
+  getDepartments(showTrashed.value)
+})
 
 onMounted(() => {
   getDepartments()
@@ -65,7 +78,12 @@ async function handleDelete(department: Department): Promise<void> {
   if (!window.confirm(`Hapus department "${department.name}"?`)) return
 
   const ok = await deleteDepartment(department.id)
-  if (ok) await getDepartments()
+  if (ok) await getDepartments(showTrashed.value)
+}
+
+async function handleRestore(department: Department): Promise<void> {
+  const ok = await restoreDepartment(department.id)
+  if (ok) await getDepartments(showTrashed.value)
 }
 </script>
 
@@ -73,13 +91,28 @@ async function handleDelete(department: Department): Promise<void> {
   <AppLayout>
     <div class="flex flex-wrap items-center justify-between gap-4">
       <h2 class="text-2xl font-bold text-gray-800">Departments</h2>
-      <button
-        v-if="authStore.isAdmin"
-        @click="openCreate"
-        class="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
-      >
-        Tambah Department
-      </button>
+
+      <div class="flex flex-wrap items-center gap-4">
+        <label
+          v-if="authStore.isAdmin"
+          class="flex cursor-pointer items-center gap-2 text-sm text-gray-600"
+        >
+          <input
+            v-model="showTrashed"
+            type="checkbox"
+            class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+          />
+          Tampilkan Data Terhapus
+        </label>
+
+        <button
+          v-if="authStore.isAdmin"
+          @click="openCreate"
+          class="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
+        >
+          Tambah Department
+        </button>
+      </div>
     </div>
 
     <p v-if="error" class="mt-4 rounded bg-red-50 px-4 py-3 text-sm text-red-600">
@@ -103,29 +136,51 @@ async function handleDelete(department: Department): Promise<void> {
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-200">
-            <tr v-for="dept in departments" :key="dept.id" class="hover:bg-gray-50">
+            <tr
+              v-for="dept in departments"
+              :key="dept.id"
+              :class="dept.deleted_at ? 'bg-red-50' : 'hover:bg-gray-50'"
+            >
               <td class="px-6 py-3 text-gray-500">{{ dept.id }}</td>
-              <td class="px-6 py-3 font-medium text-gray-800">{{ dept.name }}</td>
+              <td
+                :class="dept.deleted_at
+                  ? 'px-6 py-3 font-medium text-gray-400 line-through'
+                  : 'px-6 py-3 font-medium text-gray-800'"
+              >
+                {{ dept.name }}
+              </td>
               <td v-if="authStore.isAdmin" class="px-6 py-3">
                 <div class="flex justify-end gap-2">
                   <button
-                    @click="openEdit(dept)"
-                    class="inline-flex items-center gap-1 rounded bg-blue-50 px-3 py-1.5 text-sm font-medium text-blue-600 transition hover:bg-blue-100"
+                    v-if="dept.deleted_at"
+                    @click="handleRestore(dept)"
+                    class="inline-flex items-center gap-1 rounded bg-emerald-50 px-3 py-1.5 text-sm font-medium text-emerald-600 transition hover:bg-emerald-100"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-4 w-4">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" />
                     </svg>
-                    Edit
+                    Restore
                   </button>
-                  <button
-                    @click="handleDelete(dept)"
-                    class="inline-flex items-center gap-1 rounded bg-red-50 px-3 py-1.5 text-sm font-medium text-red-600 transition hover:bg-red-100"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-4 w-4">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-                    </svg>
-                    Delete
-                  </button>
+                  <template v-else>
+                    <button
+                      @click="openEdit(dept)"
+                      class="inline-flex items-center gap-1 rounded bg-blue-50 px-3 py-1.5 text-sm font-medium text-blue-600 transition hover:bg-blue-100"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-4 w-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
+                      </svg>
+                      Edit
+                    </button>
+                    <button
+                      @click="handleDelete(dept)"
+                      class="inline-flex items-center gap-1 rounded bg-red-50 px-3 py-1.5 text-sm font-medium text-red-600 transition hover:bg-red-100"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-4 w-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                      </svg>
+                      Delete
+                    </button>
+                  </template>
                 </div>
               </td>
             </tr>

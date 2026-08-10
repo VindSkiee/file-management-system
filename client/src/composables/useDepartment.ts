@@ -7,6 +7,7 @@ export interface Department {
   name: string
   created_at: string
   updated_at: string
+  deleted_at: string | null
 }
 
 export interface DepartmentInput {
@@ -18,12 +19,13 @@ export function useDepartment() {
   const isLoading = ref(false)
   const error = ref('')
 
-  async function getDepartments(): Promise<void> {
+  async function getDepartments(withTrashed = false): Promise<void> {
     isLoading.value = true
     error.value = ''
 
     try {
-      const { data } = await api.get<{ data: Department[] }>('/departments')
+      const params = withTrashed ? { trashed: true } : {}
+      const { data } = await api.get<{ data: Department[] }>('/departments', { params })
       departments.value = data.data
     } catch (err: unknown) {
       error.value = extractErrorMessage(err, 'Gagal memuat daftar department.')
@@ -68,6 +70,18 @@ export function useDepartment() {
     }
   }
 
+  async function restoreDepartment(id: number): Promise<boolean> {
+    error.value = ''
+
+    try {
+      await api.post(`/departments/${id}/restore`)
+      return true
+    } catch (err: unknown) {
+      error.value = extractErrorMessage(err, 'Gagal memulihkan department.')
+      return false
+    }
+  }
+
   return {
     departments,
     isLoading,
@@ -76,5 +90,6 @@ export function useDepartment() {
     createDepartment,
     updateDepartment,
     deleteDepartment,
+    restoreDepartment,
   }
 }

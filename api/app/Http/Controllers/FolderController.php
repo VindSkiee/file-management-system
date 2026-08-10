@@ -22,8 +22,9 @@ class FolderController extends Controller
         Gate::authorize('viewAny', Folder::class);
 
         $parentId = $request->integer('parent_id') ?: null;
+        $withTrashed = $request->boolean('trashed');
 
-        $folders = $this->folderService->getByParent($parentId);
+        $folders = $this->folderService->getByParent($parentId, $withTrashed);
 
         return FolderResource::collection($folders)->response();
     }
@@ -55,5 +56,15 @@ class FolderController extends Controller
         $this->folderService->delete($id);
 
         return response()->noContent();
+    }
+
+    public function restore(int $id): JsonResponse
+    {
+        $folder = $this->folderService->findWithTrashed($id);
+        Gate::authorize('restore', $folder);
+
+        $this->folderService->restore($folder);
+
+        return (new FolderResource($folder))->response();
     }
 }

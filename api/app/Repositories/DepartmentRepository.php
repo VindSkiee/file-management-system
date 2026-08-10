@@ -8,9 +8,10 @@ use Illuminate\Support\Collection;
 
 class DepartmentRepository implements DepartmentRepositoryInterface
 {
-    public function getAll(): Collection
+    public function getAll(bool $withTrashed = false): Collection
     {
         return Department::query()
+            ->when($withTrashed, fn ($query) => $query->withTrashed())
             ->orderBy('name')
             ->get();
     }
@@ -23,6 +24,11 @@ class DepartmentRepository implements DepartmentRepositoryInterface
     public function find(int $id): ?Department
     {
         return Department::query()->find($id);
+    }
+
+    public function findWithTrashed(int $id): ?Department
+    {
+        return Department::query()->withTrashed()->find($id);
     }
 
     public function create(array $data): Department
@@ -41,5 +47,10 @@ class DepartmentRepository implements DepartmentRepositoryInterface
     {
         // Eloquent soft delete: records remain in DB, hidden from default queries.
         return (bool) $department->delete();
+    }
+
+    public function restore(Department $department): bool
+    {
+        return (bool) $department->restore();
     }
 }

@@ -9,15 +9,19 @@ interface FolderRepositoryInterface
 {
     public function getTree(): Collection;
 
-    public function getByParent(?int $parentId): Collection;
+    public function getByParent(?int $parentId, bool $withTrashed = false): Collection;
 
     public function count(): int;
 
     public function find(int $id): ?Folder;
+
+    public function findWithTrashed(int $id): ?Folder;
 
     public function create(array $data): Folder;
 
     public function update(Folder $folder, array $data): Folder;
 
     public function delete(Folder $folder): bool;
+
+    public function restore(Folder $folder): bool;
 }

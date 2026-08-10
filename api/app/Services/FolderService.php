@@ -19,14 +19,25 @@ class FolderService
         return $this->folderRepository->getTree();
     }
 
-    public function getByParent(?int $parentId): Collection
+    public function getByParent(?int $parentId, bool $withTrashed = false): Collection
     {
-        return $this->folderRepository->getByParent($parentId);
+        return $this->folderRepository->getByParent($parentId, $withTrashed);
     }
 
     public function find(int $id): Folder
     {
         return $this->findOrFail($id);
+    }
+
+    public function findWithTrashed(int $id): Folder
+    {
+        $folder = $this->folderRepository->findWithTrashed($id);
+
+        if ($folder === null) {
+            throw (new ModelNotFoundException)->setModel(Folder::class, $id);
+        }
+
+        return $folder;
     }
 
     public function create(array $data): Folder
@@ -48,6 +59,11 @@ class FolderService
         $folder = $this->findOrFail($id);
 
         $this->folderRepository->delete($folder);
+    }
+
+    public function restore(Folder $folder): void
+    {
+        $this->folderRepository->restore($folder);
     }
 
     private function findOrFail(int $id): Folder

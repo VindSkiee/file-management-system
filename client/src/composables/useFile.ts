@@ -14,6 +14,7 @@ export interface FileItem {
   download_url: string
   created_at: string
   updated_at: string
+  deleted_at: string | null
 }
 
 export interface FileUpdateInput {
@@ -32,16 +33,18 @@ export function useFile() {
     folderId: number | null = null,
     search = '',
     departmentId: number | null = null,
+    withTrashed = false,
   ): Promise<void> {
     isLoading.value = true
     error.value = ''
 
     try {
-      const params: Record<string, string | number> = {}
+      const params: Record<string, string | number | boolean> = {}
 
       if (folderId !== null) params.folder_id = folderId
       if (search.trim() !== '') params.search = search.trim()
       if (departmentId !== null) params.department_id = departmentId
+      if (withTrashed) params.trashed = true
 
       const { data } = await api.get<{ data: FileItem[] }>('/files', { params })
       files.value = data.data
@@ -89,6 +92,18 @@ export function useFile() {
     }
   }
 
+  async function restoreFile(id: number): Promise<boolean> {
+    error.value = ''
+
+    try {
+      await api.post(`/files/${id}/restore`)
+      return true
+    } catch (err: unknown) {
+      error.value = extractErrorMessage(err, 'Gagal memulihkan file.')
+      return false
+    }
+  }
+
   async function downloadFile(file: FileItem): Promise<boolean> {
     error.value = ''
 
@@ -120,6 +135,7 @@ export function useFile() {
     uploadFile,
     updateFile,
     deleteFile,
+    restoreFile,
     downloadFile,
   }
 }

@@ -32,6 +32,11 @@ class FilePolicy extends BasePolicy
         return $this->isAdministrator($user);
     }
 
+    public function restore(User $user, File $file): bool
+    {
+        return $this->isAdministrator($user);
+    }
+
     public function download(User $user, File $file): bool
     {
         return true;

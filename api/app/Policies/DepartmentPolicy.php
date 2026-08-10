@@ -31,4 +31,9 @@ class DepartmentPolicy extends BasePolicy
     {
         return $this->isAdministrator($user);
     }
+
+    public function restore(User $user, Department $department): bool
+    {
+        return $this->isAdministrator($user);
+    }
 }
