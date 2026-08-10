@@ -8,8 +8,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class ActivityLog extends Model
 {
     /**
-     * The attributes that are mass assignable.
-     *
      * @var array<int, string>
      */
     protected $fillable = [
@@ -20,8 +18,6 @@ class ActivityLog extends Model
     ];
 
     /**
-     * Get the user who performed the action.
-     *
      * @return BelongsTo<User, ActivityLog>
      */
     public function user(): BelongsTo

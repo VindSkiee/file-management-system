@@ -26,8 +26,6 @@ interface FolderRepositoryInterface
     public function restore(Folder $folder): bool;
 
     /**
-     * Collect every descendant folder id (recursive, including trashed).
-     *
      * @return array<int, int>
      */
     public function getDescendantIds(int $folderId): array;

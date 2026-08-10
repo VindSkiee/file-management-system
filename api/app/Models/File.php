@@ -12,8 +12,6 @@ class File extends Model
     use HasFactory, SoftDeletes;
 
     /**
-     * The attributes that are mass assignable.
-     *
      * @var array<int, string>
      */
     protected $fillable = [
@@ -26,30 +24,22 @@ class File extends Model
     ];
 
     /**
-     * Get the folder that holds the file.
-     *
      * @return BelongsTo<Folder, File>
      */
     public function folder(): BelongsTo
     {
-        // withTrashed: nama folder tetap ter-resolve walau folder di-soft-delete.
         return $this->belongsTo(Folder::class)->withTrashed();
     }
 
     /**
-     * Get the department metadata attached to the file.
-     *
      * @return BelongsTo<Department, File>
      */
     public function department(): BelongsTo
     {
-        // withTrashed: nama department tetap ter-resolve walau di-soft-delete.
         return $this->belongsTo(Department::class)->withTrashed();
     }
 
     /**
-     * Get the user (administrator) who uploaded the file.
-     *
      * @return BelongsTo<User, File>
      */
     public function uploader(): BelongsTo

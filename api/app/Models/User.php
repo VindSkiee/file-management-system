@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -16,8 +15,6 @@ class User extends Authenticatable
     use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
 
     /**
-     * The attributes that are mass assignable.
-     *
      * @var array<int, string>
      */
     protected $fillable = [
@@ -28,8 +25,6 @@ class User extends Authenticatable
     ];
 
     /**
-     * The attributes that should be hidden for serialization.
-     *
      * @var array<int, string>
      */
     protected $hidden = [
@@ -38,8 +33,6 @@ class User extends Authenticatable
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
      * @return array<string, string>
      */
     protected function casts(): array
@@ -51,8 +44,6 @@ class User extends Authenticatable
     }
 
     /**
-     * Get the role assigned to the user.
-     *
      * @return BelongsTo<Role, User>
      */
     public function role(): BelongsTo
@@ -61,8 +52,6 @@ class User extends Authenticatable
     }
 
     /**
-     * Get the files uploaded by the user.
-     *
      * @return HasMany<File>
      */
     public function files(): HasMany

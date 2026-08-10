@@ -45,7 +45,6 @@ class DepartmentRepository implements DepartmentRepositoryInterface
 
     public function delete(Department $department): bool
     {
-        // Eloquent soft delete: records remain in DB, hidden from default queries.
         return (bool) $department->delete();
     }
 

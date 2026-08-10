@@ -8,34 +8,25 @@ use Illuminate\Validation\Rule;
 
 class UpdateFileRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
         return true;
     }
 
     /**
-     * Get the validation rules that apply to the request.
-     *
      * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
         return [
             'title' => ['required', 'string', 'max:255'],
-            // whereNull('deleted_at') rejects soft-deleted references.
             'department_id' => ['required', 'integer', Rule::exists('departments', 'id')->whereNull('deleted_at')],
             'folder_id' => ['nullable', 'integer', Rule::exists('folders', 'id')->whereNull('deleted_at')],
-            // Physical file replacement is optional while editing metadata.
             'file' => ['nullable', 'file', 'mimes:pdf,doc,docx,xls,xlsx,ppt,pptx,txt,csv,jpg,jpeg,png,gif,webp', 'max:10240'],
         ];
     }
 
     /**
-     * Get custom messages for validator errors.
-     *
      * @return array<string, string>
      */
     public function messages(): array

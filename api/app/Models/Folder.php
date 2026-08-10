@@ -13,8 +13,6 @@ class Folder extends Model
     use HasFactory, SoftDeletes;
 
     /**
-     * The attributes that are mass assignable.
-     *
      * @var array<int, string>
      */
     protected $fillable = [
@@ -23,8 +21,6 @@ class Folder extends Model
     ];
 
     /**
-     * Get the parent folder (NULL for a root folder).
-     *
      * @return BelongsTo<Folder, Folder>
      */
     public function parent(): BelongsTo
@@ -33,8 +29,6 @@ class Folder extends Model
     }
 
     /**
-     * Get the direct child folders (one level of the hierarchy).
-     *
      * @return HasMany<Folder>
      */
     public function children(): HasMany
@@ -43,8 +37,6 @@ class Folder extends Model
     }
 
     /**
-     * Recursively eager load the whole descendant tree (unlimited nesting).
-     *
      * @return HasMany<Folder>
      */
     public function childrenRecursive(): HasMany
@@ -53,8 +45,6 @@ class Folder extends Model
     }
 
     /**
-     * Get the files stored directly in this folder.
-     *
      * @return HasMany<File>
      */
     public function files(): HasMany

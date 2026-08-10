@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('files', function (Blueprint $table) {
             $table->id();
-            // Nullable: files can be uploaded at the root (no folder).
             $table->foreignId('folder_id')
                 ->nullable()
                 ->constrained('folders')
@@ -24,10 +23,10 @@ return new class extends Migration
             $table->foreignId('uploaded_by')
                 ->constrained('users')
                 ->restrictOnDelete();
-            $table->string('title');
-            $table->string('file_name'); // Original client-side file name.
-            $table->string('file_path'); // Path stored on Laravel Storage.
-            $table->timestamps();         // Upload date uses created_at.
+            $table->string('title')->index();
+            $table->string('file_name')->index();
+            $table->string('file_path');
+            $table->timestamps();
             $table->softDeletes();
         });
     }

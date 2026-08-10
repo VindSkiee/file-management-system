@@ -8,8 +8,6 @@ use Illuminate\Http\Resources\Json\JsonResource;
 class UserResource extends JsonResource
 {
     /**
-     * Transform the resource into an array.
-     *
      * @return array<string, mixed>
      */
     public function toArray(Request $request): array
@@ -18,7 +16,6 @@ class UserResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'email' => $this->email,
-            // Role metadata dibutuhkan frontend Vue untuk RBAC (Administrator/Viewer).
             'role_id' => $this->role_id,
             'role_name' => $this->whenLoaded('role', fn () => $this->role->name),
             'created_at' => $this->created_at,

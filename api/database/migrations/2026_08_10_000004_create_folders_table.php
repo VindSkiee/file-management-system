@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('folders', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            // Self-referencing FK: Root folder has NULL parent_id (unlimited nesting).
             $table->foreignId('parent_id')
                 ->nullable()
                 ->constrained('folders')

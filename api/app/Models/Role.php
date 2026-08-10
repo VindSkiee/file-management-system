@@ -12,8 +12,6 @@ class Role extends Model
     use HasFactory, SoftDeletes;
 
     /**
-     * The attributes that are mass assignable.
-     *
      * @var array<int, string>
      */
     protected $fillable = [
@@ -21,8 +19,6 @@ class Role extends Model
     ];
 
     /**
-     * Get the users that belong to the role.
-     *
      * @return HasMany<User>
      */
     public function users(): HasMany

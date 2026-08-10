@@ -10,14 +10,11 @@ use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
-    /**
-     * Handle user login and issue API token.
-     */
     public function login(LoginRequest $request): JsonResponse
     {
         $credentials = $request->validated();
 
-        if (!Auth::attempt($credentials)) {
+        if (! Auth::attempt($credentials)) {
             return response()->json([
                 'message' => 'Kredensial yang Anda masukkan tidak valid.',
             ], 401);
@@ -34,9 +31,6 @@ class AuthController extends Controller
         ], 200);
     }
 
-    /**
-     * Handle user logout and revoke current token.
-     */
     public function logout(Request $request): JsonResponse
     {
         $request->user()->currentAccessToken()->delete();
@@ -46,9 +40,6 @@ class AuthController extends Controller
         ], 200);
     }
 
-    /**
-     * Get authenticated user data.
-     */
     public function me(Request $request): JsonResponse
     {
         return response()->json([

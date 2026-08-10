@@ -18,27 +18,15 @@ use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     */
-    public function register(): void
-    {
-        //
-    }
+    public function register(): void {}
 
-    /**
-     * Bootstrap any application services.
-     */
     public function boot(): void
     {
-        // Laravel 11 has no AuthServiceProvider by default, so policies are
-        // registered here via the Gate facade.
         Gate::policy(Department::class, DepartmentPolicy::class);
         Gate::policy(Folder::class, FolderPolicy::class);
         Gate::policy(File::class, FilePolicy::class);
         Gate::policy(ActivityLog::class, ActivityLogPolicy::class);
 
-        // Model observers (activity log).
         Department::observe(DepartmentObserver::class);
         Folder::observe(FolderObserver::class);
         File::observe(FileObserver::class);

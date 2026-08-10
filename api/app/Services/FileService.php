@@ -49,8 +49,6 @@ class FileService
 
     public function create(array $data, UploadedFile $upload): File
     {
-        // store() generates a unique hashed file name on disk; the original
-        // client-side name is preserved separately in the file_name column.
         $filePath = $upload->store(self::STORAGE_DIRECTORY, self::STORAGE_DISK);
 
         return $this->fileRepository->create([

@@ -12,8 +12,6 @@ class Department extends Model
     use HasFactory, SoftDeletes;
 
     /**
-     * The attributes that are mass assignable.
-     *
      * @var array<int, string>
      */
     protected $fillable = [
@@ -21,8 +19,6 @@ class Department extends Model
     ];
 
     /**
-     * Get the files tagged with this department.
-     *
      * @return HasMany<File>
      */
     public function files(): HasMany

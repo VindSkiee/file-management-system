@@ -14,11 +14,8 @@ return new class extends Migration
         Schema::create('activity_logs', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
-            // created | updated | deleted | restored
             $table->string('action');
-            // Department | Folder | File
             $table->string('entity_type');
-            // Static name snapshot so the log survives a hard-deleted relation.
             $table->string('entity_name');
             $table->timestamps();
         });

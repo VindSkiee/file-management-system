@@ -11,8 +11,6 @@ class FolderRepository implements FolderRepositoryInterface
 {
     public function getTree(): Collection
     {
-        // Root folders (parent_id = NULL) eager-loaded with their recursive
-        // descendants. Soft-deleted children are excluded automatically.
         return Folder::query()
             ->whereNull('parent_id')
             ->with('childrenRecursive')
@@ -22,7 +20,6 @@ class FolderRepository implements FolderRepositoryInterface
 
     public function getByParent(?int $parentId, bool $withTrashed = false): Collection
     {
-        // NULL parent_id resolves to "WHERE parent_id IS NULL" (root folders).
         return Folder::query()
             ->when($withTrashed, fn ($query) => $query->withTrashed())
             ->where('parent_id', $parentId)
@@ -59,8 +56,6 @@ class FolderRepository implements FolderRepositoryInterface
 
     public function delete(Folder $folder): bool
     {
-        // Eloquent soft delete: keeps the hierarchy history and never breaks
-        // the self-referencing foreign key.
         return (bool) $folder->delete();
     }
 
@@ -90,9 +85,6 @@ class FolderRepository implements FolderRepositoryInterface
     {
         $folderIds = array_merge([$folder->id], $descendantIds);
 
-        // Soft delete (logical cascade): soft delete bypasses the FK
-        // "ON DELETE CASCADE", so files inside every folder in the subtree
-        // must be soft-deleted explicitly.
         File::query()->whereIn('folder_id', $folderIds)->delete();
         Folder::query()->whereIn('id', $folderIds)->delete();
 

@@ -18,14 +18,11 @@ class FileRepository implements FileRepositoryInterface
 
     public function getByFolder(?int $folderId, ?string $search = null, ?int $departmentId = null, bool $withTrashed = false): Collection
     {
-        // NULL folder_id resolves to "WHERE folder_id IS NULL" (root files).
         return File::query()
             ->with(['folder', 'department', 'uploader'])
             ->when($withTrashed, fn ($query) => $query->withTrashed())
             ->where('folder_id', $folderId)
             ->when($search !== null && $search !== '', function ($query) use ($search) {
-                // Nested closure keeps the file_name OR title match from
-                // overriding the folder_id / department_id filters.
                 $query->where(function ($subQuery) use ($search) {
                     $subQuery->where('file_name', 'like', "%{$search}%")
                         ->orWhere('title', 'like', "%{$search}%");
@@ -79,8 +76,6 @@ class FileRepository implements FileRepositoryInterface
 
     public function delete(File $file): bool
     {
-        // Eloquent soft delete: the physical file stays on disk until a force
-        // delete is explicitly requested.
         return (bool) $file->delete();
     }
 
