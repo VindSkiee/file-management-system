@@ -17,9 +17,9 @@ const emit = defineEmits<{
 
       <div
         :class="size === 'lg' ? 'max-w-3xl' : 'max-w-md'"
-        class="relative max-h-[85vh] w-full overflow-y-auto rounded-lg bg-white p-6 shadow-lg"
+        class="relative max-h-[85vh] w-full overflow-y-auto rounded-lg bg-white p-6 shadow-lg transition-colors duration-200 dark:bg-gray-800"
       >
-        <h3 class="text-lg font-semibold text-gray-800">{{ title }}</h3>
+        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100">{{ title }}</h3>
 
         <div class="mt-4">
           <slot />

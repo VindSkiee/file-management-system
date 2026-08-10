@@ -24,17 +24,17 @@ async function handleDownload(): Promise<void> {
 
 <template>
   <BaseModal :show="show" title="Preview File" size="lg" @close="emit('close')">
-    <p v-if="error" class="rounded bg-red-50 px-3 py-2 text-sm text-red-600">
+    <p v-if="error" class="rounded bg-red-50 px-3 py-2 text-sm text-red-600 dark:bg-red-900/30 dark:text-red-300">
       {{ error }}
     </p>
 
-    <p v-if="file" class="mb-3 truncate text-sm font-medium text-gray-800">
+    <p v-if="file" class="mb-3 truncate text-sm font-medium text-gray-800 dark:text-gray-100">
       {{ file.file_name }}
     </p>
 
     <div
       v-if="file && previewType === 'image'"
-      class="flex justify-center rounded border border-gray-200 bg-gray-50 p-2"
+      class="flex justify-center rounded border border-gray-200 bg-gray-50 p-2 transition-colors duration-200 dark:border-gray-600 dark:bg-gray-700"
     >
       <img
         :src="file.file_url"
@@ -43,11 +43,11 @@ async function handleDownload(): Promise<void> {
       />
     </div>
 
-    <div v-else-if="file && previewType === 'pdf'" class="overflow-hidden rounded border border-gray-200">
+    <div v-else-if="file && previewType === 'pdf'" class="overflow-hidden rounded border border-gray-200 transition-colors duration-200 dark:border-gray-600">
       <iframe :src="file.file_url" title="File Preview" class="h-[60vh] w-full"></iframe>
     </div>
 
-    <p v-else class="rounded border border-gray-200 bg-gray-50 px-4 py-8 text-center text-sm text-gray-500">
+    <p v-else class="rounded border border-gray-200 bg-gray-50 px-4 py-8 text-center text-sm text-gray-500 transition-colors duration-200 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-400">
       Preview tidak tersedia untuk format file ini.
     </p>
 
@@ -55,7 +55,7 @@ async function handleDownload(): Promise<void> {
       <button
         type="button"
         @click="emit('close')"
-        class="rounded bg-gray-200 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-300"
+        class="rounded bg-gray-200 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
       >
         Tutup
       </button>

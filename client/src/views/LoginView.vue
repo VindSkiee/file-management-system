@@ -32,11 +32,14 @@ async function handleSubmit(): Promise<void> {
 </script>
 
 <template>
-  <div class="flex min-h-screen items-center justify-center bg-gray-100">
-    <form @submit.prevent="handleSubmit" class="w-full max-w-sm rounded-lg bg-white p-8 shadow">
-      <h1 class="mb-6 text-center text-2xl font-bold text-gray-800">FMS Login</h1>
+  <div class="flex min-h-screen items-center justify-center bg-gray-100 transition-colors duration-200 dark:bg-gray-900">
+    <form
+      @submit.prevent="handleSubmit"
+      class="w-full max-w-sm rounded-lg bg-white p-8 shadow transition-colors duration-200 dark:bg-gray-800"
+    >
+      <h1 class="mb-6 text-center text-2xl font-bold text-gray-800 dark:text-gray-100">FMS Login</h1>
 
-      <p v-if="error" class="mb-4 rounded bg-red-50 px-3 py-2 text-sm text-red-600">
+      <p v-if="error" class="mb-4 rounded bg-red-50 px-3 py-2 text-sm text-red-600 dark:bg-red-900/30 dark:text-red-300">
         {{ error }}
       </p>
 
@@ -46,7 +49,7 @@ async function handleSubmit(): Promise<void> {
         required
         placeholder="Email"
         autocomplete="email"
-        class="mb-4 w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none"
+        class="mb-4 w-full rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400"
       />
 
       <input
@@ -55,7 +58,7 @@ async function handleSubmit(): Promise<void> {
         required
         placeholder="Password"
         autocomplete="current-password"
-        class="mb-6 w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none"
+        class="mb-6 w-full rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400"
       />
 
       <button

@@ -34,34 +34,34 @@ async function handleDownload(): Promise<void> {
 
 <template>
   <BaseModal :show="show" title="File Detail" @close="emit('close')">
-    <p v-if="error" class="rounded bg-red-50 px-3 py-2 text-sm text-red-600">
+    <p v-if="error" class="rounded bg-red-50 px-3 py-2 text-sm text-red-600 dark:bg-red-900/30 dark:text-red-300">
       {{ error }}
     </p>
 
     <dl v-if="file" class="mt-4 space-y-3 text-sm">
       <div class="flex flex-col gap-0.5 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-        <dt class="text-gray-500">Folder</dt>
-        <dd class="min-w-0 break-words font-medium text-gray-800">{{ file.folder?.name ?? 'Root' }}</dd>
+        <dt class="text-gray-500 transition-colors duration-200 dark:text-gray-400">Folder</dt>
+        <dd class="min-w-0 break-words font-medium text-gray-800 dark:text-gray-100">{{ file.folder?.name ?? 'Root' }}</dd>
       </div>
       <div class="flex flex-col gap-0.5 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-        <dt class="text-gray-500">Nama File</dt>
-        <dd class="min-w-0 break-words font-medium text-gray-800 sm:max-w-[60%] sm:truncate">{{ file.file_name }}</dd>
+        <dt class="text-gray-500 transition-colors duration-200 dark:text-gray-400">Nama File</dt>
+        <dd class="min-w-0 break-words font-medium text-gray-800 dark:text-gray-100 sm:max-w-[60%] sm:truncate">{{ file.file_name }}</dd>
       </div>
       <div class="flex flex-col gap-0.5 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-        <dt class="text-gray-500">Title</dt>
-        <dd class="min-w-0 break-words font-medium text-gray-800">{{ file.title }}</dd>
+        <dt class="text-gray-500 transition-colors duration-200 dark:text-gray-400">Title</dt>
+        <dd class="min-w-0 break-words font-medium text-gray-800 dark:text-gray-100">{{ file.title }}</dd>
       </div>
       <div class="flex flex-col gap-0.5 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-        <dt class="text-gray-500">Department</dt>
-        <dd class="min-w-0 break-words font-medium text-gray-800">{{ file.department?.name ?? '-' }}</dd>
+        <dt class="text-gray-500 transition-colors duration-200 dark:text-gray-400">Department</dt>
+        <dd class="min-w-0 break-words font-medium text-gray-800 dark:text-gray-100">{{ file.department?.name ?? '-' }}</dd>
       </div>
       <div class="flex flex-col gap-0.5 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-        <dt class="text-gray-500">Uploaded By</dt>
-        <dd class="min-w-0 break-words font-medium text-gray-800">{{ file.uploaded_by ?? '-' }}</dd>
+        <dt class="text-gray-500 transition-colors duration-200 dark:text-gray-400">Uploaded By</dt>
+        <dd class="min-w-0 break-words font-medium text-gray-800 dark:text-gray-100">{{ file.uploaded_by ?? '-' }}</dd>
       </div>
       <div class="flex flex-col gap-0.5 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-        <dt class="text-gray-500">Upload Date</dt>
-        <dd class="min-w-0 break-words font-medium text-gray-800">{{ file.upload_date }}</dd>
+        <dt class="text-gray-500 transition-colors duration-200 dark:text-gray-400">Upload Date</dt>
+        <dd class="min-w-0 break-words font-medium text-gray-800 dark:text-gray-100">{{ file.upload_date }}</dd>
       </div>
     </dl>
 
@@ -69,7 +69,7 @@ async function handleDownload(): Promise<void> {
       <button
         type="button"
         @click="emit('close')"
-        class="rounded bg-gray-200 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-300"
+        class="rounded bg-gray-200 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
       >
         Tutup
       </button>

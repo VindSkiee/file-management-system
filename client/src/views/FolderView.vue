@@ -197,12 +197,12 @@ async function handleFileDownload(file: FileItem): Promise<void> {
       <div class="flex flex-wrap items-center gap-4">
         <label
           v-if="authStore.isAdmin"
-          class="flex cursor-pointer items-center gap-2 text-sm text-gray-600"
+          class="flex cursor-pointer items-center gap-2 text-sm text-gray-600 transition-colors duration-200 dark:text-gray-300"
         >
           <input
             v-model="showTrashed"
             type="checkbox"
-            class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700"
           />
           Tampilkan Data Terhapus
         </label>
@@ -217,7 +217,7 @@ async function handleFileDownload(file: FileItem): Promise<void> {
       </div>
     </div>
 
-    <p v-if="foldersError" class="mt-4 rounded bg-red-50 px-4 py-3 text-sm text-red-600">
+    <p v-if="foldersError" class="mt-4 rounded bg-red-50 px-4 py-3 text-sm text-red-600 dark:bg-red-900/30 dark:text-red-300">
       {{ foldersError }}
     </p>
 
@@ -225,12 +225,12 @@ async function handleFileDownload(file: FileItem): Promise<void> {
       v-if="foldersLoading"
       class="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
     >
-      <div v-for="i in 8" :key="i" class="h-36 animate-pulse rounded-lg bg-gray-200"></div>
+      <div v-for="i in 8" :key="i" class="h-36 animate-pulse rounded-lg bg-gray-200 dark:bg-gray-700"></div>
     </div>
 
     <div
       v-else-if="folders.length === 0"
-      class="mt-8 rounded-lg border border-dashed border-gray-300 py-16 text-center text-sm text-gray-500"
+      class="mt-8 rounded-lg border border-dashed border-gray-300 py-16 text-center text-sm text-gray-500 transition-colors duration-200 dark:border-gray-600 dark:text-gray-400"
     >
       Folder ini kosong
     </div>
@@ -251,9 +251,9 @@ async function handleFileDownload(file: FileItem): Promise<void> {
       />
     </div>
 
-    <div class="mt-8 overflow-hidden rounded-lg bg-white shadow">
-      <div class="flex flex-wrap items-center justify-between gap-3 border-b px-4 py-4 md:px-6">
-        <h3 class="text-lg font-semibold text-gray-800">Files</h3>
+    <div class="mt-8 overflow-hidden rounded-lg bg-white shadow transition-colors duration-200 dark:bg-gray-800">
+      <div class="flex flex-wrap items-center justify-between gap-3 border-b px-4 py-4 md:px-6 dark:border-gray-700">
+        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100">Files</h3>
         <button
           v-if="authStore.isAdmin"
           @click="openCreateFile"
@@ -263,7 +263,7 @@ async function handleFileDownload(file: FileItem): Promise<void> {
         </button>
       </div>
 
-      <div class="flex flex-col gap-3 border-b px-4 py-4 md:flex-row md:items-center md:px-6">
+      <div class="flex flex-col gap-3 border-b px-4 py-4 md:flex-row md:items-center md:px-6 dark:border-gray-700">
         <div class="relative flex-1">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -271,7 +271,7 @@ async function handleFileDownload(file: FileItem): Promise<void> {
             viewBox="0 0 24 24"
             stroke-width="1.5"
             stroke="currentColor"
-            class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400"
+            class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-gray-500"
           >
             <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
           </svg>
@@ -279,13 +279,13 @@ async function handleFileDownload(file: FileItem): Promise<void> {
             v-model="searchQuery"
             type="text"
             placeholder="Cari Nama File / Title..."
-            class="w-full rounded border border-gray-300 py-2 pl-9 pr-3 text-sm focus:border-blue-500 focus:outline-none"
+            class="w-full rounded border border-gray-300 bg-white py-2 pl-9 pr-3 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400"
           />
         </div>
 
         <select
           v-model="departmentFilter"
-          class="w-full rounded border border-gray-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none md:w-56"
+          class="w-full rounded border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 md:w-56"
         >
           <option :value="null">Semua Department</option>
           <option v-for="dept in departments" :key="dept.id" :value="dept.id">
@@ -294,67 +294,67 @@ async function handleFileDownload(file: FileItem): Promise<void> {
         </select>
       </div>
 
-      <p v-if="filesError" class="border-b border-gray-100 px-6 py-3 text-sm text-red-600">
+      <p v-if="filesError" class="border-b border-gray-100 px-6 py-3 text-sm text-red-600 dark:border-gray-700 dark:text-red-300">
         {{ filesError }}
       </p>
 
-      <p v-if="filesLoading" class="px-6 py-10 text-center text-sm text-gray-500">Loading...</p>
+      <p v-if="filesLoading" class="px-6 py-10 text-center text-sm text-gray-500 dark:text-gray-400">Loading...</p>
 
-      <p v-else-if="files.length === 0" class="px-6 py-10 text-center text-sm text-gray-500">
+      <p v-else-if="files.length === 0" class="px-6 py-10 text-center text-sm text-gray-500 dark:text-gray-400">
         Belum ada file di folder ini.
       </p>
 
       <div v-else class="overflow-x-auto">
         <table class="w-full text-left text-sm md:min-w-full">
           <thead class="hidden md:table-header-group">
-            <tr class="bg-gray-50">
-              <th class="px-6 py-3 font-semibold text-gray-600">Title</th>
-              <th class="px-6 py-3 font-semibold text-gray-600">Department</th>
-              <th class="px-6 py-3 font-semibold text-gray-600">Nama File</th>
-              <th class="px-6 py-3 text-center font-semibold text-gray-600">Upload Date</th>
-              <th class="px-6 py-3 text-center font-semibold text-gray-600">Aksi</th>
+            <tr class="bg-gray-50 dark:bg-gray-700">
+              <th class="px-6 py-3 font-semibold text-gray-600 dark:text-gray-300">Title</th>
+              <th class="px-6 py-3 font-semibold text-gray-600 dark:text-gray-300">Department</th>
+              <th class="px-6 py-3 font-semibold text-gray-600 dark:text-gray-300">Nama File</th>
+              <th class="px-6 py-3 text-center font-semibold text-gray-600 dark:text-gray-300">Upload Date</th>
+              <th class="px-6 py-3 text-center font-semibold text-gray-600 dark:text-gray-300">Aksi</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-gray-200">
+          <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
             <tr
               v-for="file in files"
               :key="file.id"
-              :class="['block px-4 py-3 md:table-row md:px-0 md:py-0', file.deleted_at ? 'bg-red-50' : 'hover:bg-gray-50']"
+              :class="['block px-4 py-3 transition-colors duration-200 md:table-row md:px-0 md:py-0', file.deleted_at ? 'bg-red-50 dark:bg-red-900/30' : 'hover:bg-gray-50 dark:hover:bg-gray-700']"
             >
               <td class="block py-1 md:table-cell md:px-6 md:py-3">
-                <span class="mr-2 inline font-medium text-gray-500 md:hidden">Title:</span>
+                <span class="mr-2 inline font-medium text-gray-500 dark:text-gray-400 md:hidden">Title:</span>
                 <span
                   :class="file.deleted_at
-                    ? 'text-gray-400 line-through'
-                    : 'text-gray-700'"
+                    ? 'text-gray-400 line-through dark:text-gray-500'
+                    : 'text-gray-700 dark:text-gray-200'"
                 >
                   {{ file.title }}
                 </span>
               </td>
               <td class="block py-1 md:table-cell md:px-6 md:py-3">
-                <span class="mr-2 inline font-medium text-gray-500 md:hidden">Department:</span>
-                <span class="text-gray-700">{{ file.department?.name ?? '-' }}</span>
+                <span class="mr-2 inline font-medium text-gray-500 dark:text-gray-400 md:hidden">Department:</span>
+                <span class="text-gray-700 dark:text-gray-200">{{ file.department?.name ?? '-' }}</span>
               </td>
               <td class="block py-1 md:table-cell md:px-6 md:py-3">
-                <span class="mr-2 inline font-medium text-gray-500 md:hidden">Nama File:</span>
+                <span class="mr-2 inline font-medium text-gray-500 dark:text-gray-400 md:hidden">Nama File:</span>
                 <span
                   :class="file.deleted_at
-                    ? 'font-medium text-gray-400 line-through'
-                    : 'font-medium text-gray-800'"
+                    ? 'font-medium text-gray-400 line-through dark:text-gray-500'
+                    : 'font-medium text-gray-800 dark:text-gray-100'"
                 >
                   {{ file.file_name }}
                 </span>
               </td>
               <td class="block py-1 text-center md:table-cell md:px-6 md:py-3">
-                <span class="mr-2 inline font-medium text-gray-500 md:hidden">Upload Date:</span>
-                <span class="text-gray-700">{{ file.upload_date }}</span>
+                <span class="mr-2 inline font-medium text-gray-500 dark:text-gray-400 md:hidden">Upload Date:</span>
+                <span class="text-gray-700 dark:text-gray-200">{{ file.upload_date }}</span>
               </td>
               <td class="block pt-1 text-center md:table-cell md:px-6 md:py-3">
                 <div class="flex flex-wrap justify-center gap-2">
                   <button
                     v-if="file.deleted_at"
                     @click="handleFileRestore(file)"
-                    class="rounded bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-600 transition hover:bg-emerald-100"
+                    class="rounded bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-600 transition hover:bg-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-300 dark:hover:bg-emerald-900/50"
                   >
                     Restore
                   </button>
@@ -362,27 +362,27 @@ async function handleFileDownload(file: FileItem): Promise<void> {
                   <template v-else>
                     <button
                       @click="openFileDetail(file)"
-                      class="rounded bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-600 transition hover:bg-blue-100"
+                      class="rounded bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-600 transition hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-300 dark:hover:bg-blue-900/50"
                     >
                       View Detail
                     </button>
                     <button
                       @click="handleFileDownload(file)"
-                      class="rounded bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-600 transition hover:bg-emerald-100"
+                      class="rounded bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-600 transition hover:bg-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-300 dark:hover:bg-emerald-900/50"
                     >
                       Download
                     </button>
                     <button
                       v-if="authStore.isAdmin"
                       @click="openEditFile(file)"
-                      class="rounded bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-600 transition hover:bg-amber-100"
+                      class="rounded bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-600 transition hover:bg-amber-100 dark:bg-amber-900/30 dark:text-amber-300 dark:hover:bg-amber-900/50"
                     >
                       Edit
                     </button>
                     <button
                       v-if="authStore.isAdmin"
                       @click="handleFileDelete(file)"
-                      class="rounded bg-red-50 px-2.5 py-1 text-xs font-medium text-red-600 transition hover:bg-red-100"
+                      class="rounded bg-red-50 px-2.5 py-1 text-xs font-medium text-red-600 transition hover:bg-red-100 dark:bg-red-900/30 dark:text-red-300 dark:hover:bg-red-900/50"
                     >
                       Delete
                     </button>
@@ -400,7 +400,7 @@ async function handleFileDownload(file: FileItem): Promise<void> {
       :title="editingFolderId === null ? 'Create Folder' : 'Rename Folder'"
       @close="closeFolderModal"
     >
-      <p v-if="modalError" class="rounded bg-red-50 px-3 py-2 text-sm text-red-600">
+      <p v-if="modalError" class="rounded bg-red-50 px-3 py-2 text-sm text-red-600 dark:bg-red-900/30 dark:text-red-300">
         {{ modalError }}
       </p>
 
@@ -409,14 +409,14 @@ async function handleFileDownload(file: FileItem): Promise<void> {
           v-model="form.name"
           type="text"
           placeholder="Nama Folder"
-          class="w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none"
+          class="w-full rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400"
         />
 
         <div class="mt-6 flex justify-end gap-2">
           <button
             type="button"
             @click="closeFolderModal"
-            class="rounded bg-gray-200 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-300"
+            class="rounded bg-gray-200 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
           >
             Batal
           </button>

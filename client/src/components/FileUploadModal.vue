@@ -118,7 +118,7 @@ async function handleSubmit(): Promise<void> {
     :title="editingFile ? 'Edit File' : 'Upload File'"
     @close="emit('close')"
   >
-    <p v-if="uploadError" class="rounded bg-red-50 px-3 py-2 text-sm text-red-600">
+    <p v-if="uploadError" class="rounded bg-red-50 px-3 py-2 text-sm text-red-600 dark:bg-red-900/30 dark:text-red-300">
       {{ uploadError }}
     </p>
 
@@ -127,12 +127,12 @@ async function handleSubmit(): Promise<void> {
         v-model="form.title"
         type="text"
         placeholder="Title"
-        class="w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none"
+        class="w-full rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400"
       />
 
       <select
         v-model="form.department_id"
-        class="w-full rounded border border-gray-300 bg-white px-3 py-2 focus:border-blue-500 focus:outline-none"
+        class="w-full rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
       >
         <option :value="null" disabled>Pilih Department</option>
         <option v-for="dept in departments" :key="dept.id" :value="dept.id">
@@ -141,21 +141,21 @@ async function handleSubmit(): Promise<void> {
       </select>
 
       <div
-        class="cursor-pointer rounded-lg border-2 border-dashed border-gray-300 p-6 text-center transition hover:border-blue-500 hover:bg-blue-50/50"
+        class="cursor-pointer rounded-lg border-2 border-dashed border-gray-300 p-6 text-center transition hover:border-blue-500 hover:bg-blue-50/50 dark:border-gray-600 dark:hover:border-blue-400 dark:hover:bg-blue-900/20"
         @dragover.prevent
         @drop.prevent="onDrop"
         @click="fileInput?.click()"
       >
         <input ref="fileInput" type="file" class="hidden" @change="onFileChange" />
 
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="mx-auto h-10 w-10 text-gray-400">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="mx-auto h-10 w-10 text-gray-400 dark:text-gray-500">
           <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
         </svg>
 
-        <p v-if="selectedFile" class="mt-2 text-sm font-medium text-blue-600">
+        <p v-if="selectedFile" class="mt-2 text-sm font-medium text-blue-600 dark:text-blue-400">
           {{ selectedFile.name }}
         </p>
-        <p v-else class="mt-2 text-sm text-gray-500">
+        <p v-else class="mt-2 text-sm text-gray-500 dark:text-gray-400">
           Tarik & letakkan file di sini, atau klik untuk memilih
         </p>
       </div>
@@ -164,7 +164,7 @@ async function handleSubmit(): Promise<void> {
         <button
           type="button"
           @click="emit('close')"
-          class="rounded bg-gray-200 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-300"
+          class="rounded bg-gray-200 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
         >
           Batal
         </button>
