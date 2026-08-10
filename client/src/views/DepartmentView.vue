@@ -127,9 +127,9 @@ async function handleRestore(department: Department): Promise<void> {
       </p>
 
       <div v-else class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200 text-left text-sm">
-          <thead class="bg-gray-50">
-            <tr>
+        <table class="w-full text-left text-sm md:min-w-full">
+          <thead class="hidden md:table-header-group">
+            <tr class="bg-gray-50">
               <th class="px-6 py-3 font-semibold text-gray-600">ID</th>
               <th class="px-6 py-3 font-semibold text-gray-600">Nama Departemen</th>
               <th v-if="authStore.isAdmin" class="px-6 py-3 text-right font-semibold text-gray-600">Aksi</th>
@@ -139,18 +139,24 @@ async function handleRestore(department: Department): Promise<void> {
             <tr
               v-for="dept in departments"
               :key="dept.id"
-              :class="dept.deleted_at ? 'bg-red-50' : 'hover:bg-gray-50'"
+              :class="['block px-4 py-3 md:table-row md:px-0 md:py-0', dept.deleted_at ? 'bg-red-50' : 'hover:bg-gray-50']"
             >
-              <td class="px-6 py-3 text-gray-500">{{ dept.id }}</td>
-              <td
-                :class="dept.deleted_at
-                  ? 'px-6 py-3 font-medium text-gray-400 line-through'
-                  : 'px-6 py-3 font-medium text-gray-800'"
-              >
-                {{ dept.name }}
+              <td class="block py-1 md:table-cell md:px-6 md:py-3">
+                <span class="mr-2 inline font-medium text-gray-500 md:hidden">ID:</span>
+                <span class="text-gray-500">{{ dept.id }}</span>
               </td>
-              <td v-if="authStore.isAdmin" class="px-6 py-3">
-                <div class="flex justify-end gap-2">
+              <td class="block py-1 md:table-cell md:px-6 md:py-3">
+                <span class="mr-2 inline font-medium text-gray-500 md:hidden">Nama:</span>
+                <span
+                  :class="dept.deleted_at
+                    ? 'font-medium text-gray-400 line-through'
+                    : 'font-medium text-gray-800'"
+                >
+                  {{ dept.name }}
+                </span>
+              </td>
+              <td v-if="authStore.isAdmin" class="block pt-1 md:table-cell md:px-6 md:py-3">
+                <div class="flex flex-wrap gap-2 md:justify-end">
                   <button
                     v-if="dept.deleted_at"
                     @click="handleRestore(dept)"

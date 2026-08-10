@@ -66,7 +66,7 @@ onMounted(() => {
     </div>
 
     <div class="mt-8 overflow-hidden rounded-lg bg-white shadow">
-      <div class="border-b px-6 py-4">
+      <div class="border-b px-4 py-4 md:px-6">
         <h3 class="text-lg font-semibold text-gray-800">10 File Terbaru</h3>
       </div>
 
@@ -77,9 +77,9 @@ onMounted(() => {
       </p>
 
       <div v-else class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200 text-left text-sm">
-          <thead class="bg-gray-50">
-            <tr>
+        <table class="w-full text-left text-sm md:min-w-full">
+          <thead class="hidden md:table-header-group">
+            <tr class="bg-gray-50">
               <th class="px-6 py-3 font-semibold text-gray-600">Nama File</th>
               <th class="px-6 py-3 font-semibold text-gray-600">Title</th>
               <th class="px-6 py-3 font-semibold text-gray-600">Department</th>
@@ -87,11 +87,27 @@ onMounted(() => {
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-200">
-            <tr v-for="file in stats?.recent_files" :key="file.id" class="hover:bg-gray-50">
-              <td class="px-6 py-3 font-medium text-gray-800">{{ file.file_name }}</td>
-              <td class="px-6 py-3 text-gray-700">{{ file.title }}</td>
-              <td class="px-6 py-3 text-gray-700">{{ file.department?.name ?? '-' }}</td>
-              <td class="px-6 py-3 text-gray-700">{{ file.upload_date }}</td>
+            <tr
+              v-for="file in stats?.recent_files"
+              :key="file.id"
+              class="block px-4 py-3 hover:bg-gray-50 md:table-row md:px-0 md:py-0"
+            >
+              <td class="block py-1 md:table-cell md:px-6 md:py-3">
+                <span class="mr-2 inline font-medium text-gray-500 md:hidden">Nama File:</span>
+                <span class="font-medium text-gray-800">{{ file.file_name }}</span>
+              </td>
+              <td class="block py-1 md:table-cell md:px-6 md:py-3">
+                <span class="mr-2 inline font-medium text-gray-500 md:hidden">Title:</span>
+                <span class="text-gray-700">{{ file.title }}</span>
+              </td>
+              <td class="block py-1 md:table-cell md:px-6 md:py-3">
+                <span class="mr-2 inline font-medium text-gray-500 md:hidden">Department:</span>
+                <span class="text-gray-700">{{ file.department?.name ?? '-' }}</span>
+              </td>
+              <td class="block py-1 md:table-cell md:px-6 md:py-3">
+                <span class="mr-2 inline font-medium text-gray-500 md:hidden">Upload Date:</span>
+                <span class="text-gray-700">{{ file.upload_date }}</span>
+              </td>
             </tr>
           </tbody>
         </table>

@@ -35,29 +35,29 @@ async function handleDownload(): Promise<void> {
     </p>
 
     <dl v-if="file" class="mt-4 space-y-3 text-sm">
-      <div class="flex justify-between gap-4">
+      <div class="flex flex-col gap-0.5 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
         <dt class="text-gray-500">Folder</dt>
-        <dd class="font-medium text-gray-800">{{ file.folder?.name ?? 'Root' }}</dd>
+        <dd class="min-w-0 break-words font-medium text-gray-800">{{ file.folder?.name ?? 'Root' }}</dd>
       </div>
-      <div class="flex justify-between gap-4">
+      <div class="flex flex-col gap-0.5 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
         <dt class="text-gray-500">Nama File</dt>
-        <dd class="max-w-[60%] truncate font-medium text-gray-800">{{ file.file_name }}</dd>
+        <dd class="min-w-0 break-words font-medium text-gray-800 sm:max-w-[60%] sm:truncate">{{ file.file_name }}</dd>
       </div>
-      <div class="flex justify-between gap-4">
+      <div class="flex flex-col gap-0.5 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
         <dt class="text-gray-500">Title</dt>
-        <dd class="font-medium text-gray-800">{{ file.title }}</dd>
+        <dd class="min-w-0 break-words font-medium text-gray-800">{{ file.title }}</dd>
       </div>
-      <div class="flex justify-between gap-4">
+      <div class="flex flex-col gap-0.5 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
         <dt class="text-gray-500">Department</dt>
-        <dd class="font-medium text-gray-800">{{ file.department?.name ?? '-' }}</dd>
+        <dd class="min-w-0 break-words font-medium text-gray-800">{{ file.department?.name ?? '-' }}</dd>
       </div>
-      <div class="flex justify-between gap-4">
+      <div class="flex flex-col gap-0.5 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
         <dt class="text-gray-500">Uploaded By</dt>
-        <dd class="font-medium text-gray-800">{{ file.uploaded_by ?? '-' }}</dd>
+        <dd class="min-w-0 break-words font-medium text-gray-800">{{ file.uploaded_by ?? '-' }}</dd>
       </div>
-      <div class="flex justify-between gap-4">
+      <div class="flex flex-col gap-0.5 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
         <dt class="text-gray-500">Upload Date</dt>
-        <dd class="font-medium text-gray-800">{{ file.upload_date }}</dd>
+        <dd class="min-w-0 break-words font-medium text-gray-800">{{ file.upload_date }}</dd>
       </div>
     </dl>
 

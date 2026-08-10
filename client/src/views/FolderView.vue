@@ -252,7 +252,7 @@ async function handleFileDownload(file: FileItem): Promise<void> {
     </div>
 
     <div class="mt-8 overflow-hidden rounded-lg bg-white shadow">
-      <div class="flex flex-wrap items-center justify-between gap-3 border-b px-6 py-4">
+      <div class="flex flex-wrap items-center justify-between gap-3 border-b px-4 py-4 md:px-6">
         <h3 class="text-lg font-semibold text-gray-800">Files</h3>
         <button
           v-if="authStore.isAdmin"
@@ -263,7 +263,7 @@ async function handleFileDownload(file: FileItem): Promise<void> {
         </button>
       </div>
 
-      <div class="flex flex-col gap-3 border-b px-6 py-4 md:flex-row md:items-center">
+      <div class="flex flex-col gap-3 border-b px-4 py-4 md:flex-row md:items-center md:px-6">
         <div class="relative flex-1">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -305,9 +305,9 @@ async function handleFileDownload(file: FileItem): Promise<void> {
       </p>
 
       <div v-else class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200 text-left text-sm">
-          <thead class="bg-gray-50">
-            <tr>
+        <table class="w-full text-left text-sm md:min-w-full">
+          <thead class="hidden md:table-header-group">
+            <tr class="bg-gray-50">
               <th class="px-6 py-3 font-semibold text-gray-600">Nama File</th>
               <th class="px-6 py-3 font-semibold text-gray-600">Title</th>
               <th class="px-6 py-3 font-semibold text-gray-600">Department</th>
@@ -318,25 +318,34 @@ async function handleFileDownload(file: FileItem): Promise<void> {
             <tr
               v-for="file in files"
               :key="file.id"
-              :class="file.deleted_at ? 'bg-red-50' : 'hover:bg-gray-50'"
+              :class="['block px-4 py-3 md:table-row md:px-0 md:py-0', file.deleted_at ? 'bg-red-50' : 'hover:bg-gray-50']"
             >
-              <td
-                :class="file.deleted_at
-                  ? 'px-6 py-3 font-medium text-gray-400 line-through'
-                  : 'px-6 py-3 font-medium text-gray-800'"
-              >
-                {{ file.file_name }}
+              <td class="block py-1 md:table-cell md:px-6 md:py-3">
+                <span class="mr-2 inline font-medium text-gray-500 md:hidden">Nama File:</span>
+                <span
+                  :class="file.deleted_at
+                    ? 'font-medium text-gray-400 line-through'
+                    : 'font-medium text-gray-800'"
+                >
+                  {{ file.file_name }}
+                </span>
               </td>
-              <td
-                :class="file.deleted_at
-                  ? 'px-6 py-3 text-gray-400 line-through'
-                  : 'px-6 py-3 text-gray-700'"
-              >
-                {{ file.title }}
+              <td class="block py-1 md:table-cell md:px-6 md:py-3">
+                <span class="mr-2 inline font-medium text-gray-500 md:hidden">Title:</span>
+                <span
+                  :class="file.deleted_at
+                    ? 'text-gray-400 line-through'
+                    : 'text-gray-700'"
+                >
+                  {{ file.title }}
+                </span>
               </td>
-              <td class="px-6 py-3 text-gray-700">{{ file.department?.name ?? '-' }}</td>
-              <td class="px-6 py-3">
-                <div class="flex flex-wrap justify-end gap-2">
+              <td class="block py-1 md:table-cell md:px-6 md:py-3">
+                <span class="mr-2 inline font-medium text-gray-500 md:hidden">Department:</span>
+                <span class="text-gray-700">{{ file.department?.name ?? '-' }}</span>
+              </td>
+              <td class="block pt-1 md:table-cell md:px-6 md:py-3">
+                <div class="flex flex-wrap gap-2 md:justify-end">
                   <button
                     v-if="file.deleted_at"
                     @click="handleFileRestore(file)"

@@ -38,7 +38,7 @@ async function handleLogout(): Promise<void> {
       </nav>
 
       <div class="border-t border-gray-800 p-4">
-        <p class="text-sm font-medium text-white">{{ authStore.user?.name }}</p>
+        <p class="truncate text-sm font-medium text-white">{{ authStore.user?.name }}</p>
         <p class="mt-0.5 text-xs text-gray-400">
           {{ authStore.isAdmin ? 'Administrator' : authStore.isViewer ? 'Viewer' : '' }}
         </p>
@@ -51,25 +51,38 @@ async function handleLogout(): Promise<void> {
       </div>
     </aside>
 
-    <div class="flex flex-1 flex-col">
-      <header class="flex h-16 items-center justify-between bg-white px-6 shadow md:hidden">
-        <h1 class="text-lg font-bold text-gray-800">FMS</h1>
-        <button @click="handleLogout" class="text-sm font-medium text-red-600 hover:underline">
-          Logout
-        </button>
-      </header>
+    <div class="flex min-w-0 flex-1 flex-col">
+      <div class="sticky top-0 z-30 md:hidden">
+        <header class="flex h-16 items-center justify-between gap-3 bg-white px-4 shadow">
+          <div class="min-w-0">
+            <h1 class="text-lg font-bold leading-tight text-gray-800">FMS</h1>
+            <p class="truncate text-xs text-gray-500">
+              {{ authStore.user?.name }}
+              <template v-if="authStore.isAdmin || authStore.isViewer">
+                · {{ authStore.isAdmin ? 'Administrator' : 'Viewer' }}
+              </template>
+            </p>
+          </div>
+          <button
+            @click="handleLogout"
+            class="shrink-0 rounded bg-red-50 px-3 py-1.5 text-sm font-medium text-red-600 transition hover:bg-red-100"
+          >
+            Logout
+          </button>
+        </header>
 
-      <nav class="flex space-x-2 overflow-x-auto border-b bg-white px-4 py-2 md:hidden">
-        <router-link
-          v-for="item in navItems"
-          :key="item.label"
-          :to="item.to"
-          class="shrink-0 rounded px-3 py-1.5 text-sm font-medium transition"
-          :class="route.name === item.to.name ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
-        >
-          {{ item.label }}
-        </router-link>
-      </nav>
+        <nav class="flex space-x-2 overflow-x-auto border-b bg-white px-4 py-2">
+          <router-link
+            v-for="item in navItems"
+            :key="item.label"
+            :to="item.to"
+            class="shrink-0 rounded px-3 py-1.5 text-sm font-medium transition"
+            :class="route.name === item.to.name ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
+          >
+            {{ item.label }}
+          </router-link>
+        </nav>
+      </div>
 
       <main class="flex-1 p-4 md:p-8">
         <slot />

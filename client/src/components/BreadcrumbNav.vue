@@ -14,18 +14,20 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <nav class="flex flex-wrap items-center gap-1 text-sm text-gray-600" aria-label="Breadcrumb">
+  <nav class="flex min-w-0 flex-wrap items-center gap-1 text-sm text-gray-600" aria-label="Breadcrumb">
     <template v-for="(item, index) in items" :key="item.id ?? 'root'">
       <button
         v-if="index < items.length - 1"
         type="button"
-        class="transition hover:text-blue-600 hover:underline"
+        class="max-w-[9rem] truncate transition hover:text-blue-600 hover:underline sm:max-w-[14rem]"
         @click="emit('navigate', item)"
       >
         {{ item.name }}
       </button>
 
-      <span v-else class="font-semibold text-gray-800">{{ item.name }}</span>
+      <span v-else class="max-w-[9rem] truncate font-semibold text-gray-800 sm:max-w-[14rem]">
+        {{ item.name }}
+      </span>
 
       <svg
         v-if="index < items.length - 1"
@@ -34,7 +36,7 @@ const emit = defineEmits<{
         viewBox="0 0 24 24"
         stroke-width="2"
         stroke="currentColor"
-        class="h-3.5 w-3.5 text-gray-400"
+        class="h-3.5 w-3.5 shrink-0 text-gray-400"
       >
         <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
       </svg>
