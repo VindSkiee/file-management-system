@@ -3,6 +3,7 @@ import { computed, onMounted, reactive, ref, watch } from 'vue'
 import AppLayout from '@/layouts/AppLayout.vue'
 import BaseModal from '@/components/BaseModal.vue'
 import BreadcrumbNav, { type BreadcrumbItem } from '@/components/BreadcrumbNav.vue'
+import FileBatchUploadModal from '@/components/FileBatchUploadModal.vue'
 import FileDetailModal from '@/components/FileDetailModal.vue'
 import FileUploadModal from '@/components/FileUploadModal.vue'
 import FolderCard from '@/components/FolderCard.vue'
@@ -33,8 +34,10 @@ const {
   lastPage: filesLastPage,
   getFiles,
   deleteFile,
+  deleteFiles,
   restoreFile,
   downloadFile,
+  downloadFilesAsZip,
 } = useFile()
 
 const currentParentId = ref<number | null>(null)
@@ -60,6 +63,18 @@ const editingFile = ref<FileItem | null>(null)
 const showDetailModal = ref(false)
 const detailFile = ref<FileItem | null>(null)
 
+const selectedIds = ref<Set<number>>(new Set())
+const dragCounter = ref(0)
+const isDragging = ref(false)
+const showBatchModal = ref(false)
+const batchFiles = ref<File[]>([])
+
+const selectedCount = computed(() => selectedIds.value.size)
+const pageFileIds = computed(() => files.value.filter((file) => !file.deleted_at).map((file) => file.id))
+const allSelectedOnPage = computed(
+  () => pageFileIds.value.length > 0 && pageFileIds.value.every((id) => selectedIds.value.has(id)),
+)
+
 onMounted(() => {
   getDepartments(false, 1, 100)
   loadFolderContents()
@@ -71,6 +86,7 @@ watch([searchQuery, departmentFilter], () => {
   clearTimeout(searchTimer)
   searchTimer = setTimeout(() => {
     filesPage.value = 1
+    clearSelection()
     reloadFiles()
   }, 300)
 })
@@ -78,6 +94,7 @@ watch([searchQuery, departmentFilter], () => {
 watch(showTrashed, () => {
   foldersPage.value = 1
   filesPage.value = 1
+  clearSelection()
   loadFolderContents()
 })
 
@@ -108,6 +125,7 @@ function openFolder(folder: Folder): void {
   currentParentId.value = folder.id
   foldersPage.value = 1
   filesPage.value = 1
+  clearSelection()
   breadcrumbs.value = [...breadcrumbs.value, { id: folder.id, name: folder.name }]
   loadFolderContents()
 }
@@ -122,6 +140,7 @@ function navigateTo(item: BreadcrumbItem): void {
   currentParentId.value = item.id
   foldersPage.value = 1
   filesPage.value = 1
+  clearSelection()
   loadFolderContents()
 }
 
@@ -215,6 +234,81 @@ async function handleFileRestore(file: FileItem): Promise<void> {
 async function handleFileDownload(file: FileItem): Promise<void> {
   await downloadFile(file)
 }
+
+function toggleSelectFile(id: number): void {
+  const next = new Set(selectedIds.value)
+
+  if (next.has(id)) next.delete(id)
+  else next.add(id)
+
+  selectedIds.value = next
+}
+
+function toggleSelectAll(): void {
+  const next = new Set(selectedIds.value)
+
+  if (allSelectedOnPage.value) {
+    pageFileIds.value.forEach((id) => next.delete(id))
+  } else {
+    pageFileIds.value.forEach((id) => next.add(id))
+  }
+
+  selectedIds.value = next
+}
+
+function clearSelection(): void {
+  selectedIds.value = new Set()
+}
+
+async function handleBulkDelete(): Promise<void> {
+  const ids = [...selectedIds.value]
+  if (ids.length === 0) return
+
+  if (!window.confirm(`Hapus ${ids.length} file terpilih?`)) return
+
+  const ok = await deleteFiles(ids)
+  if (ok) {
+    clearSelection()
+    await loadFolderContents()
+  }
+}
+
+async function handleBulkDownload(): Promise<void> {
+  const ids = [...selectedIds.value]
+  if (ids.length === 0) return
+
+  const ok = await downloadFilesAsZip(ids)
+  if (ok) clearSelection()
+}
+
+function onDragEnter(): void {
+  dragCounter.value++
+  isDragging.value = true
+}
+
+function onDragLeave(): void {
+  dragCounter.value--
+  if (dragCounter.value <= 0) {
+    dragCounter.value = 0
+    isDragging.value = false
+  }
+}
+
+function onDropFiles(event: DragEvent): void {
+  dragCounter.value = 0
+  isDragging.value = false
+  const dropped = Array.from(event.dataTransfer?.files ?? [])
+  if (dropped.length === 0) return
+
+  batchFiles.value = dropped
+  showBatchModal.value = true
+}
+
+function handleBatchUploaded(): void {
+  showBatchModal.value = false
+  filesPage.value = 1
+  loadFolderContents()
+}
 </script>
 
 <template>
@@ -306,7 +400,24 @@ async function handleFileDownload(file: FileItem): Promise<void> {
       </div>
     </div>
 
-    <div class="mt-8 overflow-hidden rounded-lg bg-white shadow transition-colors duration-200 dark:bg-gray-800">
+    <div
+      class="relative mt-8 overflow-hidden rounded-lg bg-white shadow transition-colors duration-200 dark:bg-gray-800"
+      @dragenter.prevent="onDragEnter"
+      @dragover.prevent
+      @dragleave="onDragLeave"
+      @drop.prevent="onDropFiles"
+    >
+      <div
+        v-if="isDragging"
+        class="absolute inset-0 z-20 flex items-center justify-center rounded-lg border-2 border-dashed border-blue-400 bg-blue-50/80 backdrop-blur-sm transition-all duration-200 dark:bg-blue-900/60"
+      >
+        <p class="flex items-center gap-2 text-sm font-semibold text-blue-600 dark:text-blue-300">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6 animate-bounce">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
+          </svg>
+          Lepaskan file untuk mengunggah
+        </p>
+      </div>
       <div class="flex flex-wrap items-center justify-between gap-3 border-b px-4 py-4 md:px-6 dark:border-gray-700">
         <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100">Files</h3>
         <button
@@ -349,6 +460,39 @@ async function handleFileDownload(file: FileItem): Promise<void> {
         </select>
       </div>
 
+      <div
+        v-if="selectedCount > 0"
+        class="flex flex-wrap items-center justify-between gap-3 border-b bg-blue-50 px-4 py-3 transition-colors duration-200 dark:border-gray-700 dark:bg-blue-900/20"
+      >
+        <p class="text-sm font-medium text-blue-700 dark:text-blue-300">
+          {{ selectedCount }} file dipilih
+        </p>
+        <div class="flex flex-wrap gap-2">
+          <button
+            type="button"
+            @click="clearSelection"
+            class="rounded bg-gray-200 px-3 py-1.5 text-xs font-medium text-gray-700 transition hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+          >
+            Batal
+          </button>
+          <button
+            type="button"
+            @click="handleBulkDownload"
+            class="rounded bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-emerald-700"
+          >
+            Unduh
+          </button>
+          <button
+            v-if="authStore.isAdmin"
+            type="button"
+            @click="handleBulkDelete"
+            class="rounded bg-red-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-red-700"
+          >
+            Hapus
+          </button>
+        </div>
+      </div>
+
       <p v-if="filesError" class="border-b border-gray-100 px-6 py-3 text-sm text-red-600 dark:border-gray-700 dark:text-red-300">
         {{ filesError }}
       </p>
@@ -363,6 +507,14 @@ async function handleFileDownload(file: FileItem): Promise<void> {
         <table class="w-full text-left text-sm md:min-w-full">
           <thead class="hidden md:table-header-group">
             <tr class="bg-gray-50 dark:bg-gray-700">
+              <th class="px-4 py-3 md:px-6">
+                <input
+                  type="checkbox"
+                  :checked="allSelectedOnPage"
+                  @change="toggleSelectAll"
+                  class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700"
+                />
+              </th>
               <th class="px-6 py-3 font-semibold text-gray-600 dark:text-gray-300">Title</th>
               <th class="px-6 py-3 font-semibold text-gray-600 dark:text-gray-300">Department</th>
               <th class="px-6 py-3 font-semibold text-gray-600 dark:text-gray-300">Nama File</th>
@@ -376,6 +528,15 @@ async function handleFileDownload(file: FileItem): Promise<void> {
               :key="file.id"
               :class="['block px-4 py-3 transition-colors duration-200 md:table-row md:px-0 md:py-0', file.deleted_at ? 'bg-red-50 dark:bg-red-900/30' : 'hover:bg-gray-50 dark:hover:bg-gray-700']"
             >
+              <td class="block py-1 md:table-cell md:px-4 md:py-3">
+                <input
+                  v-if="!file.deleted_at"
+                  type="checkbox"
+                  :checked="selectedIds.has(file.id)"
+                  @change="toggleSelectFile(file.id)"
+                  class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700"
+                />
+              </td>
               <td class="block py-1 md:table-cell md:px-6 md:py-3">
                 <span class="mr-2 inline font-medium text-gray-500 dark:text-gray-400 md:hidden">Title:</span>
                 <span
@@ -519,6 +680,14 @@ async function handleFileDownload(file: FileItem): Promise<void> {
       :editing-file="editingFile"
       @close="showFileModal = false"
       @success="handleFileSaved"
+    />
+
+    <FileBatchUploadModal
+      :show="showBatchModal"
+      :folder-id="currentParentId"
+      :files="batchFiles"
+      @close="showBatchModal = false"
+      @success="handleBatchUploaded"
     />
 
     <FileDetailModal

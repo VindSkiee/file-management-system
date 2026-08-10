@@ -7,8 +7,10 @@ use App\Repositories\Interfaces\FileRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class FileService
@@ -40,6 +42,11 @@ class FileService
         }
 
         return $file;
+    }
+
+    public function findMany(array $ids): Collection
+    {
+        return $this->fileRepository->findMany($ids);
     }
 
     public function create(array $data, UploadedFile $upload): File
@@ -77,6 +84,11 @@ class FileService
         $this->fileRepository->delete($file);
     }
 
+    public function deleteMany(array $ids): int
+    {
+        return $this->fileRepository->deleteMany($ids);
+    }
+
     public function restore(File $file): void
     {
         $this->fileRepository->restore($file);
@@ -87,6 +99,27 @@ class FileService
         $file = $this->findOrFail($id);
 
         return Storage::disk(self::STORAGE_DISK)->download($file->file_path, $file->file_name);
+    }
+
+    public function downloadMany(array $ids): BinaryFileResponse
+    {
+        $files = $this->fileRepository->findMany($ids);
+
+        $zipPath = tempnam(sys_get_temp_dir(), 'fms_').'.zip';
+        $zip = new \ZipArchive;
+        $zip->open($zipPath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
+
+        foreach ($files as $file) {
+            $path = Storage::disk(self::STORAGE_DISK)->path($file->file_path);
+
+            if (is_file($path)) {
+                $zip->addFile($path, $file->file_name);
+            }
+        }
+
+        $zip->close();
+
+        return response()->download($zipPath, 'files.zip')->deleteFileAfterSend(true);
     }
 
     private function findOrFail(int $id): File

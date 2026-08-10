@@ -18,11 +18,15 @@ interface FileRepositoryInterface
 
     public function findWithTrashed(int $id): ?File;
 
+    public function findMany(array $ids): Collection;
+
     public function create(array $data): File;
 
     public function update(File $file, array $data): File;
 
     public function delete(File $file): bool;
+
+    public function deleteMany(array $ids): int;
 
     public function restore(File $file): bool;
 }

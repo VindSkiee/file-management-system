@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\BulkDeleteFileRequest;
 use App\Http\Requests\StoreFileRequest;
 use App\Http\Requests\UpdateFileRequest;
 use App\Http\Resources\FileResource;
@@ -11,6 +12,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class FileController extends Controller
@@ -86,5 +89,41 @@ class FileController extends Controller
         Gate::authorize('download', $file);
 
         return $this->fileService->download($id);
+    }
+
+    public function bulkDelete(BulkDeleteFileRequest $request): Response
+    {
+        $ids = $request->validated()['ids'];
+
+        $files = $this->fileService->findMany($ids);
+
+        if ($files->isEmpty()) {
+            throw ValidationException::withMessages(['ids' => 'File tidak ditemukan atau sudah dihapus.']);
+        }
+
+        Gate::authorize('delete', $files->first());
+
+        $this->fileService->deleteMany($ids);
+
+        return response()->noContent();
+    }
+
+    public function bulkDownload(Request $request): BinaryFileResponse
+    {
+        $ids = collect(explode(',', (string) $request->query('ids')))
+            ->filter(fn ($id) => is_numeric($id))
+            ->map(fn ($id) => (int) $id)
+            ->values()
+            ->all();
+
+        $files = $this->fileService->findMany($ids);
+
+        if ($files->isEmpty()) {
+            throw ValidationException::withMessages(['ids' => 'File tidak ditemukan atau sudah dihapus.']);
+        }
+
+        Gate::authorize('download', $files->first());
+
+        return $this->fileService->downloadMany($ids);
     }
 }

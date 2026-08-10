@@ -23,7 +23,7 @@ async function handleLogout(): Promise<void> {
 
 <template>
   <div class="flex min-h-screen bg-gray-100 transition-colors duration-200 dark:bg-gray-900">
-    <aside class="hidden w-64 flex-col border-r border-gray-800 bg-gray-900 text-white md:flex">
+    <aside class="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col overflow-y-auto border-r border-gray-800 bg-gray-900 text-white md:flex">
       <div class="flex h-16 items-center border-b border-gray-800 px-6">
         <h1 class="text-lg font-bold">FMS</h1>
       </div>
@@ -73,7 +73,7 @@ async function handleLogout(): Promise<void> {
       </div>
     </aside>
 
-    <div class="flex min-w-0 flex-1 flex-col">
+    <div class="flex min-w-0 flex-1 flex-col md:pl-64">
       <div class="sticky top-0 z-30 md:hidden">
         <header class="flex h-16 items-center justify-between gap-3 bg-white px-4 shadow transition-colors duration-200 dark:bg-gray-800">
           <div class="min-w-0">

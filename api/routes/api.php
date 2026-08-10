@@ -33,6 +33,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('folders', FolderController::class)->except(['show']);
     Route::post('/folders/{folder}/restore', [FolderController::class, 'restore'])->name('folders.restore');
 
+    Route::get('/files/bulk-download', [FileController::class, 'bulkDownload'])->name('files.bulk-download');
+    Route::post('/files/bulk-delete', [FileController::class, 'bulkDelete'])->name('files.bulk-delete');
     Route::get('/files/{file}/download', [FileController::class, 'download'])->name('files.download');
     Route::post('/files/{file}/restore', [FileController::class, 'restore'])->name('files.restore');
     Route::apiResource('files', FileController::class);

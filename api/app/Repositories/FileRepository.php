@@ -55,6 +55,14 @@ class FileRepository implements FileRepositoryInterface
             ->find($id);
     }
 
+    public function findMany(array $ids): Collection
+    {
+        return File::query()
+            ->with(['folder', 'department', 'uploader'])
+            ->whereIn('id', $ids)
+            ->get();
+    }
+
     public function create(array $data): File
     {
         return File::query()->create($data);
@@ -70,6 +78,11 @@ class FileRepository implements FileRepositoryInterface
     public function delete(File $file): bool
     {
         return (bool) $file->delete();
+    }
+
+    public function deleteMany(array $ids): int
+    {
+        return File::query()->whereIn('id', $ids)->delete();
     }
 
     public function restore(File $file): bool

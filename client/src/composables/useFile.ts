@@ -101,6 +101,18 @@ export function useFile() {
     }
   }
 
+  async function deleteFiles(ids: number[]): Promise<boolean> {
+    error.value = ''
+
+    try {
+      await api.post('/files/bulk-delete', { ids })
+      return true
+    } catch (err: unknown) {
+      error.value = extractErrorMessage(err, 'Gagal menghapus file.')
+      return false
+    }
+  }
+
   async function restoreFile(id: number): Promise<boolean> {
     error.value = ''
 
@@ -135,6 +147,31 @@ export function useFile() {
     }
   }
 
+  async function downloadFilesAsZip(ids: number[]): Promise<boolean> {
+    error.value = ''
+
+    try {
+      const response = await api.get('/files/bulk-download', {
+        params: { ids: ids.join(',') },
+        responseType: 'blob',
+      })
+
+      const url = URL.createObjectURL(response.data)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = 'files.zip'
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+      URL.revokeObjectURL(url)
+
+      return true
+    } catch (err: unknown) {
+      error.value = extractErrorMessage(err, 'Gagal mengunduh file.')
+      return false
+    }
+  }
+
   return {
     files,
     fileDetail,
@@ -146,7 +183,9 @@ export function useFile() {
     uploadFile,
     updateFile,
     deleteFile,
+    deleteFiles,
     restoreFile,
     downloadFile,
+    downloadFilesAsZip,
   }
 }
