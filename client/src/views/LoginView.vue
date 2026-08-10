@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { isAxiosError } from 'axios'
 import { useAuthStore } from '@/stores/authStore'
+import { extractErrorMessage } from '@/utils/error'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -20,11 +20,7 @@ async function handleSubmit(): Promise<void> {
     await authStore.login({ email: email.value, password: password.value })
     router.push({ name: 'dashboard' })
   } catch (err: unknown) {
-    if (isAxiosError(err)) {
-      error.value = err.response?.data?.message ?? 'Kredensial tidak valid.'
-    } else {
-      error.value = 'Terjadi kesalahan. Silakan coba lagi.'
-    }
+    error.value = extractErrorMessage(err, 'Kredensial tidak valid.')
   } finally {
     loading.value = false
   }

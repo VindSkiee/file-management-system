@@ -28,6 +28,14 @@ function formatDate(value: string): string {
   return `${day} ${month} ${date.getFullYear()} ${time}`
 }
 
+const formattedLogs = computed(() =>
+  logs.value.map((log) => ({
+    ...log,
+    date: formatDate(log.created_at),
+    badge: badgeClass(log.action),
+  })),
+)
+
 const canPrev = computed(() => page.value > 1)
 const canNext = computed(() => page.value < lastPage.value)
 
@@ -71,13 +79,13 @@ onMounted(() => {
           </thead>
           <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
             <tr
-              v-for="log in logs"
+              v-for="log in formattedLogs"
               :key="log.id"
               class="block px-4 py-3 transition-colors duration-200 hover:bg-gray-50 dark:hover:bg-gray-700 md:table-row md:px-0 md:py-0"
             >
               <td class="block py-1 md:table-cell md:px-6 md:py-3">
                 <span class="mr-2 inline font-medium text-gray-500 dark:text-gray-400 md:hidden">Tanggal:</span>
-                <span class="text-gray-700 dark:text-gray-200">{{ formatDate(log.created_at) }}</span>
+                <span class="text-gray-700 dark:text-gray-200">{{ log.date }}</span>
               </td>
               <td class="block py-1 md:table-cell md:px-6 md:py-3 text-center">
                 <span class="mr-2 inline font-medium text-gray-500 dark:text-gray-400 md:hidden">Pengguna:</span>
@@ -87,7 +95,7 @@ onMounted(() => {
                 <span class="mr-2 inline font-medium text-gray-500 dark:text-gray-400 md:hidden">Aksi:</span>
                 <span
                   class="inline-block rounded px-2 py-0.5 text-xs font-semibold capitalize"
-                  :class="badgeClass(log.action)"
+                  :class="log.badge"
                 >
                   {{ log.action }}
                 </span>

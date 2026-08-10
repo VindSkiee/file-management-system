@@ -16,7 +16,6 @@ function getInitialDark(): boolean {
   return window.matchMedia('(prefers-color-scheme: dark)').matches
 }
 
-// Diterapkan saat module di-import (sebelum mount) agar tidak ada flash mode terang.
 const isDark = ref(getInitialDark())
 applyDark(isDark.value)
 
@@ -31,7 +30,6 @@ export function useDarkMode() {
     const media = window.matchMedia('(prefers-color-scheme: dark)')
 
     media.addEventListener('change', (event) => {
-      // Hanya ikuti sistem jika user belum pernah memilih secara manual.
       if (localStorage.getItem(DARK_MODE_KEY) === null) {
         isDark.value = event.matches
         applyDark(isDark.value)

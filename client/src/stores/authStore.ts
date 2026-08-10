@@ -27,7 +27,6 @@ export const useAuthStore = defineStore('auth', () => {
   const user = ref<User | null>(null)
 
   const isAuthenticated = computed(() => user.value !== null)
-  // Backend UserResource flattens role.name into role_name.
   const isAdmin = computed(() => user.value?.role_name === 'Administrator')
   const isViewer = computed(() => user.value?.role_name === 'Viewer')
 

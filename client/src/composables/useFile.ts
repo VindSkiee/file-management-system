@@ -59,7 +59,6 @@ export function useFile() {
     error.value = ''
 
     try {
-      // Axios sets multipart/form-data (with boundary) automatically for FormData.
       await api.post('/files', formData)
       return true
     } catch (err: unknown) {
